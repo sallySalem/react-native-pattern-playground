@@ -4,7 +4,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import HomeScreen from '../screens/HomeScreen';
-import StrategyScreen from '../patterns/strategy/demo/StrategyScreen.tsx';
+import StrategyScreen from '../patterns/strategy/demo/StrategyScreen';
 
 
 export type RootStackParamList = {

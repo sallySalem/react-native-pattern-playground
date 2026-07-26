@@ -1,4 +1,4 @@
-import { PaymentResult } from './PaymentResult.ts';
+import { PaymentResult } from './PaymentResult';
 
 export interface PaymentStrategy {
   pay(amount: number): PaymentResult;

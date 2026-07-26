@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import RadioButton from '../../../components/RadioButton';
 import { CheckoutService } from '../services/CheckoutService';
-import { PaymentType } from '../domain/PaymentType.ts';
-import { PaymentStrategyFactory } from '../factories/PaymentStrategyFactory.ts';
+import { PaymentType } from '../domain/PaymentType';
+import { PaymentStrategyFactory } from '../factories/PaymentStrategyFactory';
 
 const StrategyScreen = () => {
   const [selectedPayment, setSelectedPayment] =

@@ -1,8 +1,8 @@
 import { PaymentStrategy } from '../domain/PaymentStrategy';
 import { PaymentType } from '../domain/PaymentType';
-import { CreditCardPayment } from '../domain/payment/CreditCardPayment.ts';
-import { PaypalPayment } from '../domain/payment/PaypalPayment.ts';
-import { ApplePayPayment } from '../domain/payment/ApplePayPayment.ts';
+import { CreditCardPayment } from '../domain/payment/CreditCardPayment';
+import { PaypalPayment } from '../domain/payment/PaypalPayment';
+import { ApplePayPayment } from '../domain/payment/ApplePayPayment';
 
 export class PaymentStrategyFactory {
   static create(type: PaymentType): PaymentStrategy {
