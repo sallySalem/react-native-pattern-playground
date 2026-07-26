@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
-
 import { View, Text, Button, StyleSheet } from 'react-native';
-
 import RadioButton from '../../../components/RadioButton';
-
 import { CheckoutService } from '../services/CheckoutService';
 import { PaymentType } from '../domain/PaymentType.ts';
-import { CreditCardPayment } from '../domain/payment/CreditCardPayment.ts';
-import { PaypalPayment } from '../domain/payment/PaypalPayment.ts';
-import { ApplePayPayment } from '../domain/payment/ApplePayPayment.ts';
+import { PaymentStrategyFactory } from '../factories/PaymentStrategyFactory.ts';
 
 const StrategyScreen = () => {
   const [selectedPayment, setSelectedPayment] =
@@ -17,24 +12,8 @@ const StrategyScreen = () => {
   const [result, setResult] = useState<string>('');
 
   const handlePayment = () => {
-    let paymentStrategy;
 
-    switch (selectedPayment) {
-      case 'creditCard':
-        paymentStrategy = new CreditCardPayment();
-
-        break;
-
-      case 'paypal':
-        paymentStrategy = new PaypalPayment();
-
-        break;
-
-      case 'applePay':
-        paymentStrategy = new ApplePayPayment();
-
-        break;
-    }
+    const paymentStrategy = PaymentStrategyFactory.create(selectedPayment);
 
     const checkout = new CheckoutService(paymentStrategy!);
 
