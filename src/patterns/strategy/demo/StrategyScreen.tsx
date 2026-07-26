@@ -1,24 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import RadioButton from '../../../components/RadioButton';
 import { CheckoutService } from '../services/CheckoutService';
 import { PaymentType } from '../domain/PaymentType';
 import { PaymentStrategyFactory } from '../factories/PaymentStrategyFactory';
 
 const StrategyScreen = () => {
-  const [selectedPayment, setSelectedPayment] =
-    useState<PaymentType>('creditCard');
-
+  const [selectedPayment, setSelectedPayment] = useState<PaymentType>('creditCard');
   const [result, setResult] = useState<string>('');
 
   const handlePayment = () => {
-
     const paymentStrategy = PaymentStrategyFactory.create(selectedPayment);
-
-    const checkout = new CheckoutService(paymentStrategy!);
-
+    const checkout = new CheckoutService(paymentStrategy);
     const paymentResult = checkout.checkout(100);
-
     setResult(paymentResult.message);
   };
 
@@ -28,23 +21,37 @@ const StrategyScreen = () => {
 
       <Text style={styles.subtitle}>Choose Payment Method</Text>
 
-      <RadioButton
-        label="Credit Card"
-        selected={selectedPayment === 'creditCard'}
-        onPress={() => setSelectedPayment('creditCard')}
-      />
+      <View style={styles.radioContainer}>
+        <Text
+          style={[
+            styles.radioButton,
+            selectedPayment === 'creditCard' && styles.radioButtonSelected,
+          ]}
+          onPress={() => setSelectedPayment('creditCard')}
+        >
+          {selectedPayment === 'creditCard' ? '●' : '○'} Credit Card
+        </Text>
 
-      <RadioButton
-        label="PayPal"
-        selected={selectedPayment === 'paypal'}
-        onPress={() => setSelectedPayment('paypal')}
-      />
+        <Text
+          style={[
+            styles.radioButton,
+            selectedPayment === 'paypal' && styles.radioButtonSelected,
+          ]}
+          onPress={() => setSelectedPayment('paypal')}
+        >
+          {selectedPayment === 'paypal' ? '●' : '○'} PayPal
+        </Text>
 
-      <RadioButton
-        label="Apple Pay"
-        selected={selectedPayment === 'applePay'}
-        onPress={() => setSelectedPayment('applePay')}
-      />
+        <Text
+          style={[
+            styles.radioButton,
+            selectedPayment === 'applePay' && styles.radioButtonSelected,
+          ]}
+          onPress={() => setSelectedPayment('applePay')}
+        >
+          {selectedPayment === 'applePay' ? '●' : '○'} Apple Pay
+        </Text>
+      </View>
 
       <Text style={styles.selectedText}>
         Selected Strategy: {selectedPayment}
@@ -61,6 +68,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#fff',
   },
 
   title: {
@@ -72,17 +80,39 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 18,
     marginBottom: 15,
+    fontWeight: '600',
+  },
+
+  radioContainer: {
+    marginBottom: 20,
+  },
+
+  radioButton: {
+    fontSize: 16,
+    marginVertical: 10,
+    padding: 10,
+    borderRadius: 4,
+  },
+
+  radioButtonSelected: {
+    backgroundColor: '#f0f0f0',
+    fontWeight: '600',
   },
 
   selectedText: {
-    marginTop: 25,
-    marginBottom: 20,
+    marginVertical: 20,
     fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
   },
 
   result: {
     marginTop: 25,
-    fontSize: 18,
+    fontSize: 16,
+    padding: 15,
+    backgroundColor: '#e8f5e9',
+    borderRadius: 4,
+    color: '#2e7d32',
   },
 });
 
