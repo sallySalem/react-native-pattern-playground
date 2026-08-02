@@ -35,6 +35,25 @@ class CheckoutService {
 }
 ```
 
+### The Scalability Problem
+
+As you add more payment methods, the code grows linearly and becomes increasingly difficult to maintain:
+
+```
+Without Strategy Pattern:
+┌─ CheckoutService ─────────────────────────────────┐
+│  ├─ if (creditCard) → hardcoded logic              │
+│  ├─ if (paypal) → hardcoded logic                  │
+│  ├─ if (applePay) → hardcoded logic                │
+│  ├─ if (googlePay) → hardcoded logic               │
+│  ├─ if (stripe) → hardcoded logic                  │
+│  └─ ... more and more conditions                   │
+└────────────────────────────────────────────────────┘
+           ↓
+     Need to modify CheckoutService
+     for EVERY new payment method ❌
+```
+
 ### Issues with This Approach
 
 #### 1. **High Coupling** 
@@ -68,7 +87,7 @@ Instead of embedding payment algorithms inside the checkout flow, we define a co
 
 ```typescript
 interface PaymentStrategy {
-  pay(amount: number): PaymentResult;
+ pay(amount: number): PaymentResult;
 }
 ```
 
@@ -87,37 +106,11 @@ Now the checkout process depends only on the abstraction, not concrete implement
 
 ---
 
-## Architecture Diagram
-
-```mermaid
-classDiagram
-    class PaymentStrategy {
-        <<interface>>
-        +pay(amount)
-    }
-
-    class CreditCardPayment
-    class PaypalPayment
-    class ApplePayPayment
-
-    class CheckoutService {
-        -strategy: PaymentStrategy
-        +checkout()
-    }
-
-    class PaymentStrategyFactory
-
-    PaymentStrategy <|.. CreditCardPayment
-    PaymentStrategy <|.. PaypalPayment
-    PaymentStrategy <|.. ApplePayPayment
-
-    CheckoutService --> PaymentStrategy : uses
-    PaymentStrategyFactory --> CheckoutService : creates strategy
-```
-
----
-
 ## Has-A vs Is-A: Composition Over Inheritance
+
+### Why This Matters for Strategy Pattern
+
+The Strategy Pattern fundamentally relies on **composition (Has-A)** rather than inheritance (Is-A). Understanding this distinction is critical to using the pattern correctly.
 
 ### Understanding the Difference
 
@@ -270,7 +263,72 @@ newCheckout.checkout(100);
 
 ---
 
-## Benefits of Strategy Pattern
+## Architecture Diagram
+
+```mermaid
+classDiagram
+    class PaymentStrategy {
+        <<interface>>
+        +pay(amount: number) PaymentResult
+    }
+
+    class CreditCardPayment {
+        +pay(amount: number) PaymentResult
+    }
+    
+    class PaypalPayment {
+        +pay(amount: number) PaymentResult
+    }
+    
+    class ApplePayPayment {
+        +pay(amount: number) PaymentResult
+    }
+
+    class CheckoutService {
+        -strategy: PaymentStrategy
+        +checkout(amount: number) PaymentResult
+    }
+
+    class PaymentStrategyFactory {
+        +create(type: PaymentType) PaymentStrategy
+    }
+
+    PaymentStrategy <|.. CreditCardPayment
+    PaymentStrategy <|.. PaypalPayment
+    PaymentStrategy <|.. ApplePayPayment
+
+    CheckoutService --> PaymentStrategy : uses
+    PaymentStrategyFactory --> PaymentStrategy : creates
+```
+
+---
+
+---
+
+## User Journey & Runtime Behavior Flow
+
+Here's how users interact with your system using the Strategy Pattern:
+
+```mermaid
+graph LR
+    A["User Selects<br/>Payment Method"] -->|"User Input"| B["Factory<br/>Creates Strategy"]
+    B -->|"Strategy Instance"| C["CheckoutService<br/>Initialized"]
+    C -->|"Execute"| D["Specific Payment<br/>Algorithm Runs"]
+    D -->|"Result"| E["Success/Failure<br/>Displayed to User"]
+    
+    style A fill:#e1f5ff,stroke:#01579b
+    style B fill:#fff3e0,stroke:#e65100
+    style C fill:#f3e5f5,stroke:#4a148c
+    style D fill:#fce4ec,stroke:#880e4f
+    style E fill:#e8f5e9,stroke:#1b5e20
+```
+
+This flow demonstrates:
+- **Decoupling**: UI doesn't know payment details
+- **Flexibility**: Same flow works for any payment method
+- **Extensibility**: Add new methods without changing the flow
+
+---
 
 ### 1. **Runtime Behavior Switching** 
 
@@ -511,7 +569,52 @@ sequenceDiagram
 
 ---
 
-## When to Use Strategy Pattern
+---
+
+## Real-World Strategy Pattern Examples
+
+The Strategy Pattern appears in many applications you use daily:
+
+### 1. **Payment Processing** ✅ *This Tutorial*
+- Credit Card, PayPal, Apple Pay, Google Pay, Cryptocurrency
+- Each has different validation, authorization, and settlement processes
+
+### 2. **Sorting Algorithms**
+```typescript
+interface SortingStrategy {
+  sort(items: number[]): number[];
+}
+
+class QuickSort implements SortingStrategy { }
+class MergeSort implements SortingStrategy { }
+class BubbleSort implements SortingStrategy { }
+
+class DataProcessor {
+  constructor(private sortStrategy: SortingStrategy) {}
+  
+  processData(items: number[]) {
+    return this.sortStrategy.sort(items);
+  }
+}
+```
+
+### 3. **Notification Delivery**
+- Email, SMS, Push Notifications, Slack, Discord
+- Each uses different protocols and delivery mechanisms
+
+### 4. **Export/Import Formats**
+- PDF Export, CSV Export, JSON Export, Excel Export
+- Each format requires different serialization logic
+
+### 5. **Authentication Methods**
+- Local password, OAuth 2.0, SAML, JWT, Multi-factor authentication
+- Each validates credentials differently
+
+### 6. **Compression Algorithms**
+- ZIP, GZIP, BROTLI, 7Z compression
+- File compression use the Strategy Pattern to swap algorithms
+
+---
 
 **Use Strategy Pattern when:**
 - Multiple algorithms/behaviors exist for the same operation
@@ -567,7 +670,88 @@ class CheckoutService {
 
 ---
 
-## Comparison: Strategy vs Factory Pattern
+---
+
+## Anti-Patterns: When NOT to Use Strategy
+
+### ❌ **Mistake 1: Over-Engineering Simple Problems**
+
+```typescript
+// DON'T DO THIS - Overkill for single behavior
+interface DataFormatStrategy {
+  format(data: object): string;
+}
+
+class JsonFormatter implements DataFormatStrategy {
+  format(data: object): string {
+    return JSON.stringify(data);
+  }
+}
+
+const formatter = new JsonFormatter();
+formatter.format(myData);
+
+// JUST USE THIS - Keep it simple
+JSON.stringify(myData);
+```
+
+### ❌ **Mistake 2: Premature Generalization**
+
+```typescript
+// DON'T DO THIS - Only one strategy, no need for the pattern
+interface PaymentStrategy {
+  pay(amount: number): PaymentResult;
+}
+
+class OnlyPaymentMethod implements PaymentStrategy {
+  pay(amount: number): PaymentResult {
+    return { success: true };
+  }
+}
+
+// DO THIS - Add the pattern when you have 2+ variations
+```
+
+### ❌ **Mistake 3: Creating Stateful Strategies**
+
+```typescript
+// DON'T DO THIS - Strategy shouldn't hold mutable state
+class CreditCardPayment implements PaymentStrategy {
+  private balance = 0; // ❌ Stateful
+  
+  pay(amount: number): PaymentResult {
+    this.balance -= amount;
+    return { success: true };
+  }
+}
+
+// DO THIS - Keep strategies stateless
+class CreditCardPayment implements PaymentStrategy {
+  pay(amount: number): PaymentResult {
+    return { success: true };
+  }
+}
+```
+
+### ❌ **Mistake 4: Complex Strategy Hierarchies**
+
+```typescript
+// DON'T DO THIS - Strategies shouldn't have inheritance
+abstract class BasePaymentStrategy {
+  abstract pay(): PaymentResult;
+}
+
+class CreditCardPayment extends BasePaymentStrategy { } // Too many layers
+
+// DO THIS - Keep it flat and simple
+interface PaymentStrategy {
+  pay(amount: number): PaymentResult;
+}
+
+class CreditCardPayment implements PaymentStrategy { }
+```
+
+---
 
 | Aspect | Strategy Pattern | Factory Pattern |
 |--------|------------------|-----------------|
