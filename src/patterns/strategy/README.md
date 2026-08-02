@@ -6,9 +6,9 @@ The **Strategy Pattern** is a behavioral design pattern that allows defining a f
 
 In this example, we simulate a payment system where users can choose different payment methods at runtime:
 
-- 💳 **Credit Card**
-- 🅿️ **PayPal**
-- 🍎 **Apple Pay**
+- **Credit Card**
+- **PayPal**
+- **Apple Pay**
 
 The application can switch between these payment behaviors without changing the checkout flow. This demonstrates how the Strategy Pattern provides flexibility and maintainability in complex business logic.
 
@@ -37,7 +37,7 @@ class CheckoutService {
 
 ### Issues with This Approach
 
-#### 1. **High Coupling** 🔗
+#### 1. **High Coupling** 
 
 The checkout logic knows **every payment implementation**. Adding a new payment method requires modifying existing code.
 
@@ -48,27 +48,15 @@ if (paymentType === "googlePay") {
 }
 ```
 
-#### 2. **Violates Open/Closed Principle (OCP)** ❌
+#### 2. **Violates Open/Closed Principle (OCP)** 
 
 The code is **not closed for modification**. Every new payment type requires changing existing classes.
 
-**Before adding Google Pay:**
-```
-CheckoutService
-  └─ if/else logic (closed for extension)
-```
-
-**After adding Google Pay:**
-```
-CheckoutService (modified!)
-  └─ if/else logic (still more conditions...)
-```
-
-#### 3. **Difficult Testing** 🧪
+#### 3. **Difficult Testing** 
 
 The checkout service contains multiple behaviors, making tests harder to isolate and harder to mock individual payment methods.
 
-#### 4. **Maintenance Nightmare** 🔥
+#### 4. **Maintenance Nightmare** 
 
 Every new payment method increases the complexity of the `CheckoutService`. The code becomes harder to read and understand as it grows.
 
@@ -87,11 +75,11 @@ interface PaymentStrategy {
 Each payment method implements this contract independently:
 
 ```
-PaymentStrategy (Interface - The Contract)
-      ▲
-      │
-      ├─────────────────────────────────┐
-      │                                 │
+          PaymentStrategy (Interface - The Contract)
+                               ▲
+                               │
+      ├────────────────────────├────────────────────┐
+      │                        │                    │
 CreditCardPayment        PaypalPayment        ApplePayPayment
 ```
 
@@ -102,24 +90,29 @@ Now the checkout process depends only on the abstraction, not concrete implement
 ## Architecture Diagram
 
 ```mermaid
-graph TD
-    A["📱 StrategyScreen<br/>(UI - User Selection)"]
-    B["🏭 PaymentStrategyFactory<br/>(Object Creation)"]
-    C["🛒 CheckoutService<br/>(Business Logic)"]
-    D["📋 PaymentStrategy Interface<br/>(The Contract)"]
-    E["💳 CreditCardPayment<br/>(Implementation)"]
-    F["🅿️ PaypalPayment<br/>(Implementation)"]
-    G["🍎 ApplePayPayment<br/>(Implementation)"]
+classDiagram
+    class PaymentStrategy {
+        <<interface>>
+        +pay(amount)
+    }
 
-    A -->|1. Select Payment Method| B
-    B -->|2. Create Strategy| C
-    C -->|3. Depends on Interface| D
-    D -->|implements| E
-    D -->|implements| F
-    D -->|implements| G
-    E -->|executes pay()| D
-    F -->|executes pay()| D
-    G -->|executes pay()| D
+    class CreditCardPayment
+    class PaypalPayment
+    class ApplePayPayment
+
+    class CheckoutService {
+        -strategy: PaymentStrategy
+        +checkout()
+    }
+
+    class PaymentStrategyFactory
+
+    PaymentStrategy <|.. CreditCardPayment
+    PaymentStrategy <|.. PaypalPayment
+    PaymentStrategy <|.. ApplePayPayment
+
+    CheckoutService --> PaymentStrategy : uses
+    PaymentStrategyFactory --> CheckoutService : creates strategy
 ```
 
 ---
@@ -279,7 +272,7 @@ newCheckout.checkout(100);
 
 ## Benefits of Strategy Pattern
 
-### 1. **Runtime Behavior Switching** 🔄
+### 1. **Runtime Behavior Switching** 
 
 The user can change the payment behavior while the application is running without recreating the checkout service.
 
@@ -294,7 +287,7 @@ CheckoutService executes PayPal behavior
 Checkout flow remains unchanged
 ```
 
-### 2. **Better Separation of Responsibilities** 🎯
+### 2. **Better Separation of Responsibilities** 
 
 Each component has a single, well-defined responsibility:
 
@@ -324,7 +317,7 @@ CreditCardPayment / PaypalPayment / ApplePayPayment
 └─ Specific payment algorithms
 ```
 
-### 3. **Easier Extension** 📦
+### 3. **Easier Extension** 
 
 Adding a new payment method doesn't require modifying existing code:
 
@@ -352,7 +345,7 @@ class GooglePayPayment implements PaymentStrategy {
 export type PaymentType = 'creditCard' | 'paypal' | 'applePay' | 'googlePay';
 ```
 
-### 4. **Improved Testability** 🧪
+### 4. **Improved Testability** 
 
 Each payment method can be tested independently:
 
@@ -379,7 +372,7 @@ describe('CheckoutService', () => {
 });
 ```
 
-### 5. **Follows SOLID Principles** ✨
+### 5. **Follows SOLID Principles** 
 
 - **Single Responsibility Principle (SRP):** Each class has one responsibility
 - **Open/Closed Principle (OCP):** Open for extension, closed for modification
@@ -520,8 +513,7 @@ sequenceDiagram
 
 ## When to Use Strategy Pattern
 
-✅ **Use Strategy Pattern when:**
-
+**Use Strategy Pattern when:**
 - Multiple algorithms/behaviors exist for the same operation
 - Behaviors change independently
 - Runtime switching is required
@@ -529,8 +521,8 @@ sequenceDiagram
 - You expect future extensions
 - You need better testability
 
-❌ **Avoid Strategy Pattern when:**
 
+**Avoid Strategy Pattern when:**
 - Only one behavior exists (unnecessary abstraction)
 - The problem is simple and unlikely to change
 - Performance is critical (strategy switching has overhead)
@@ -562,12 +554,12 @@ class GooglePayPayment implements PaymentStrategy { }
 High-level modules depend on abstractions:
 
 ```typescript
-// ✅ Good: Depends on interface
+// Good: Depends on interface
 class CheckoutService {
   constructor(private paymentStrategy: PaymentStrategy) {}
 }
 
-// ❌ Bad: Depends on concrete class
+// Bad: Depends on concrete class
 class CheckoutService {
   constructor(private creditCard: CreditCardPayment) {}
 }
@@ -597,31 +589,6 @@ graph LR
 
 ---
 
-## Key Takeaways 🎓
-
-1. **Strategy Pattern = Behavior at Runtime**
-   - Define a family of algorithms
-   - Encapsulate each one
-   - Make them interchangeable
-
-2. **Has-A > Is-A**
-   - Composition provides flexibility
-   - Inheritance creates rigid hierarchies
-
-3. **SOLID Principles in Action**
-   - Single Responsibility
-   - Open/Closed
-   - Dependency Inversion
-
-4. **Real-World Applications**
-   - Payment processors (our example)
-   - Sorting algorithms
-   - Export formats (PDF, Excel, CSV)
-   - Compression algorithms
-   - Routing strategies
-   - Authentication methods
-
----
 
 ## Testing
 
@@ -634,47 +601,3 @@ npm test -- patterns/strategy
 # Test coverage
 npm test -- patterns/strategy --coverage
 ```
-
-Test files:
-- `CreditCardPayment.test.ts`
-- `PaypalPayment.test.ts`
-- `ApplePayPayment.test.ts`
-- `PaymentStrategyFactory.test.ts`
-- `CheckoutService.test.ts`
-- `StrategyScreen.test.tsx`
-
----
-
-## References & Resources
-
-- [Strategy Pattern - Refactoring Guru](https://refactoring.guru/design-patterns/strategy)
-- [TypeScript Handbook - Interfaces](https://www.typescriptlang.org/docs/handbook/interfaces.html)
-- [SOLID Principles in TypeScript](https://www.digitalocean.com/community/tutorials/s-o-l-i-d-one-o-responsibility-principle)
-- [Composition vs Inheritance](https://www.codementor.io/@danielebogo/composition-vs-inheritance-in-object-oriented-design-38n5e0t9f)
-
----
-
-## Code Quality Notes
-
-✅ **What's Good About This Implementation:**
-
-- Clear separation of concerns
-- Easy to test (mockable strategies)
-- Easy to extend (new payment methods)
-- Type-safe (TypeScript interfaces)
-- Follows React best practices
-- Factory pattern for object creation
-- Comprehensive test coverage
-
-🔧 **Future Improvements:**
-
-- Add error handling and validation
-- Implement strategy pooling/caching
-- Add logging and monitoring
-- Support async payment operations
-- Add transaction history
-- Implement retry logic
-
----
-
-**Created with ❤️ for clean architecture in React Native**
