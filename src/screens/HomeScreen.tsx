@@ -1,20 +1,25 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 
-const HomeScreen = () => {
+import { View, Text, Button } from 'react-native';
+
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+import { RootStackParamList } from '../navigation/AppNavigator';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+
+const HomeScreen = ({ navigation }: Props) => {
+
   return (
-    <View style={styles.container}>
-      <Text>Home Screen</Text>
+    <View>
+      <Text>React Native Pattern Playground</Text>
+
+      <Button
+        title="Strategy Pattern"
+        onPress={() => navigation.navigate('Strategy')}
+      />
     </View>
   );
 };
 
 export default HomeScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
