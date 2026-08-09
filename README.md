@@ -25,6 +25,34 @@ opened from the app. The goal is to learn how patterns improve maintainability a
 
 Explore the patterns by category.
 
+```mermaid
+graph TD
+    A["React Native<br/>Design Patterns Playground"]
+    A --> B["Behavioral Patterns"]
+    A --> C["Creational Patterns"]
+    A --> D["Structural Patterns"]
+    B --> B1["Strategy"]
+    B --> B2["Observer"]
+    B --> B3["..."]
+%%    B --> B3["Command"]
+%%    B --> B4["State"]
+%%    B --> B5["Chain of Responsibility"]
+    C --> C1["..."]
+%%    C --> C1["Factory Method"]
+%%    C --> C2["Abstract Factory"]
+%%    C --> C3["Builder"]
+%%    C --> C4["Prototype"]
+%%    C --> C5["Singleton"]
+    D --> D1["..."]
+%%    D --> D1["Adapter"]
+%%    D --> D2["Bridge"]
+%%    D --> D3["Composite"]
+%%    D --> D4["Decorator"]
+%%    D --> D5["Facade"]
+%%    D --> D6["Proxy"]
+
+```
+
 ### 🧠 Behavioral Patterns
 
 Patterns that focus on communication between objects and how behavior can vary independently.
