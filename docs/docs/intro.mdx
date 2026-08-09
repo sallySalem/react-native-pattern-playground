@@ -1,0 +1,32 @@
+---
+sidebar_position: 1
+---
+
+# Strategy Pattern
+
+A practical example of the Strategy Pattern using React Native and TypeScript.
+
+## Architecture
+
+```mermaid
+classDiagram
+    class PaymentStrategy {
+        <<interface>>
+        +pay(amount: number) PaymentResult
+    }
+
+    class CreditCardPayment {
+        +pay(amount: number) PaymentResult
+    }
+
+    class PaypalPayment {
+        +pay(amount: number) PaymentResult
+    }
+
+    class ApplePayPayment {
+        +pay(amount: number) PaymentResult
+    }
+
+    PaymentStrategy <|.. CreditCardPayment
+    PaymentStrategy <|.. PaypalPayment
+    PaymentStrategy <|.. ApplePayPayment
