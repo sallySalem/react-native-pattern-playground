@@ -1,57 +1,107 @@
 # React Native Design Patterns Playground
 
-A practical exploration of software design patterns implemented with React Native + TypeScript. This repository contains small, focused examples that demonstrate how common design patterns map to real-world mobile app code.
+A practical exploration of software design patterns implemented with **React Native + TypeScript**.
 
-Table of Contents
-- [About](#about)
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Project Structure](#project-structure)
-- [Patterns & Demos](#patterns--demos)
-- [Scripts](#scripts)
-- [Contributing](#contributing)
-- [License](#license)
+This repository is a hands-on learning playground where each pattern is explained, visualized, implemented, and demonstrated through a small React Native example.
+
+> **Learn the pattern → Visualize the design → Explore the implementation → Run the example**
+
+📚 **[Explore the Documentation](#documentation)**
 
 ---
 
 ## About
 
-Each pattern lives under src/patterns and includes a short README, implementation, and a small demo screen that can be opened from the app. The goal is to learn how patterns improve maintainability and testability in React Native.
+The goal of this project is to explore how software design patterns can be applied to real-world mobile application development.
 
-## Prerequisites
+Each pattern focuses on:
 
-- Node.js (16+) and npm or Yarn
-- Xcode for iOS development (macOS)
-- Android Studio + Android SDK for Android
-- CocoaPods (for iOS native dependencies)
+* 🧠 **Concept** — What problem does the pattern solve?
+* 📐 **Design** — How are the objects/components structured?
+* 💻 **Implementation** — How can the pattern be implemented with TypeScript?
+* 📱 **React Native Demo** — How does the pattern look in a real mobile application?
+* 🧪 **Testing** — How can the design be tested and maintained?
 
-## Quick Start
+The examples are intentionally small and focused so the design of each pattern is easy to understand.
 
-1. Install dependencies:
+---
+
+## 📚 Documentation
+
+The full pattern walkthroughs, diagrams, and explanations will be available through the project's documentation site.
+
+**🚧 Documentation site coming soon**
+
+> The documentation will provide a structured way to explore the patterns by category, with diagrams, explanations, implementation details, and interactive examples.
+
+---
+
+## 🧩 Patterns
+
+### Behavioral Patterns
+
+| Pattern      | Example                    | Documentation                                           |
+| ------------ | -------------------------- | ------------------------------------------------------- |
+| **Strategy** | Dynamic Payment Processing | [Read the walkthrough](src/patterns/strategy/README.md) |
+| Observer     | Coming soon                | —                                                       |
+| Command      | Coming soon                | —                                                       |
+| State        | Coming soon                | —                                                       |
+
+### Creational Patterns
+
+| Pattern   | Example     | Documentation |
+| --------- | ----------- | ------------- |
+| Factory   | Coming soon | —             |
+| Builder   | Coming soon | —             |
+| Singleton | Coming soon | —             |
+
+### Structural Patterns
+
+| Pattern   | Example     | Documentation |
+| --------- | ----------- | ------------- |
+| Adapter   | Coming soon | —             |
+| Decorator | Coming soon | —             |
+| Facade    | Coming soon | —             |
+| Proxy     | Coming soon | —             |
+
+> More patterns will be added progressively.
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+* Node.js (16+) and npm or Yarn
+* Xcode for iOS development (macOS)
+* Android Studio + Android SDK for Android
+* CocoaPods (for iOS native dependencies)
+
+### Install dependencies
 
 ```sh
-# npm
 npm install
-
-# or yarn
-# yarn install
 ```
 
-2. Start Metro:
+Or:
+
+```sh
+yarn install
+```
+
+### Start Metro
 
 ```sh
 npm start
-# or
-# yarn start
 ```
 
-3. Run on Android:
+### Run on Android
 
 ```sh
 npm run android
 ```
 
-4. Run on iOS (macOS only):
+### Run on iOS
 
 ```sh
 bundle install
@@ -59,34 +109,56 @@ bundle exec pod install --project-directory=ios
 npm run ios
 ```
 
-## Project Structure
+---
 
-```
+## 🗂️ Project Structure
+
+```text
 src/
-  patterns/         # Pattern implementations + READMEs
-    strategy/       # Strategy pattern example + demo screen
-  demo/              # App demo screens
-  services/          # Example services used by demos
+├── patterns/
+│   ├── strategy/
+│   │   ├── README.md
+│   │   ├── diagrams/
+│   │   └── ...
+│   ├── observer/
+│   │   └── ...
+│   └── ...
+│
+├── demo/              # App demo screens
+└── services/          # Example services used by demos
 ```
 
-## Patterns & Demos
+Each pattern is kept self-contained with its explanation, implementation, and supporting resources.
 
-- [Strategy Pattern - Dynamic Payment Processing](src/patterns/strategy/README.md)
+---
 
-(Use the app demo screens to try each pattern interactively.)
+## 🛠️ Scripts
 
-## Scripts
+Common npm scripts (see `package.json` for exact commands):
 
-Common npm scripts (see package.json for exact commands):
+```text
+npm start        Start Metro bundler
+npm run android  Build & run on Android
+npm run ios      Build & run on iOS
+npm test         Run tests
+```
 
-- npm start — start Metro bundler
-- npm run android — build & install on Android emulator/device
-- npm run ios — build & run on iOS simulator (macOS)
-- npm test — run tests
+---
 
-## Contributing
+## 🤝 Contributing
 
-Contributions welcome. Please open issues for ideas or PRs with small, focused changes. Keep demos self-contained and add tests for new examples.
+Contributions are welcome.
+
+If you would like to add a new pattern:
+
+1. Create a dedicated pattern folder under `src/patterns`.
+2. Include a README explaining the pattern.
+3. Add diagrams where they help explain the design.
+4. Add a small React Native demo.
+5. Add tests where appropriate.
+6. Keep the example focused on the pattern itself.
+
+---
 
 ## License
 
