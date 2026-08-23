@@ -1,5 +1,5 @@
-import { PaymentStrategy } from '../domain/PaymentStrategy';
-import { PaymentResult } from '../domain/PaymentResult';
+import { PaymentStrategy } from '../domain/PaymentStrategy.ts';
+import { PaymentResult } from '../domain/PaymentResult.ts';
 
 export class CheckoutService {
   constructor(private paymentStrategy: PaymentStrategy) {}

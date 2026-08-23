@@ -57,10 +57,10 @@ graph TD
 
 Patterns that focus on communication between objects and how behavior can vary independently.
 
-| Pattern      | Example                                                       | Status         |
-|--------------|---------------------------------------------------------------|----------------|
-| **Strategy** | [Dynamic Payment Processing](src/patterns/strategy/README.md) | ✅ Available    |
-| Observer     | —                                                             | 🚧 Coming soon |
+| Pattern      | Example                                                                  | Status         |
+|--------------|--------------------------------------------------------------------------|----------------|
+| **Strategy** | [Dynamic Payment Processing](src/patterns/behavioral/strategy/README.md) | ✅ Available    |
+| Observer     | —                                                                        | 🚧 Coming soon |
 
 [//]: # (| Command | — | 🚧 Coming soon |)
 

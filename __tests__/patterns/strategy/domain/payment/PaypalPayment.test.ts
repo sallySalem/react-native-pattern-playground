@@ -1,5 +1,5 @@
-import { PaypalPayment } from '../../../../../src/patterns/strategy/domain/payment/PaypalPayment';
-import { PaymentResult } from '../../../../../src/patterns/strategy/domain/PaymentResult';
+import { PaypalPayment } from '../../../../../src/patterns/behavioral/strategy/domain/payment/PaypalPayment';
+import { PaymentResult } from '../../../../../src/patterns/behavioral/strategy/domain/PaymentResult';
 
 describe('PaypalPayment', () => {
   let paypal: PaypalPayment;
@@ -37,4 +37,3 @@ describe('PaypalPayment', () => {
     expect(result.message).toBe('Paid 1000 using PayPal');
   });
 });
-

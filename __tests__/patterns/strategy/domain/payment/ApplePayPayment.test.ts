@@ -1,5 +1,5 @@
-import { ApplePayPayment } from '../../../../../src/patterns/strategy/domain/payment/ApplePayPayment';
-import { PaymentResult } from '../../../../../src/patterns/strategy/domain/PaymentResult';
+import { ApplePayPayment } from '../../../../../src/patterns/behavioral/strategy/domain/payment/ApplePayPayment';
+import { PaymentResult } from '../../../../../src/patterns/behavioral/strategy/domain/PaymentResult';
 
 describe('ApplePayPayment', () => {
   let applePay: ApplePayPayment;
@@ -39,4 +39,3 @@ describe('ApplePayPayment', () => {
     expect(result.message).toBe('Paid -50 using Apple Pay');
   });
 });
-

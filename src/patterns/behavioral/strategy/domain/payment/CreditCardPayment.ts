@@ -1,5 +1,5 @@
-import { PaymentResult } from '../PaymentResult';
-import { PaymentStrategy } from '../PaymentStrategy';
+import { PaymentResult } from '../PaymentResult.ts';
+import { PaymentStrategy } from '../PaymentStrategy.ts';
 
 export class CreditCardPayment implements PaymentStrategy {
   pay(amount: number): PaymentResult {

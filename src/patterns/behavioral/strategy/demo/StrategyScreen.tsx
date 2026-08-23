@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
-import { CheckoutService } from '../services/CheckoutService';
-import { PaymentType } from '../domain/PaymentType';
-import { PaymentStrategyFactory } from '../factories/PaymentStrategyFactory';
+import { Button, StyleSheet, Text, View } from 'react-native';
+import { CheckoutService } from '../services/CheckoutService.ts';
+import { PaymentType } from '../domain/PaymentType.ts';
+import { PaymentStrategyFactory } from '../factories/PaymentStrategyFactory.ts';
 
 const StrategyScreen = () => {
-  const [selectedPayment, setSelectedPayment] = useState<PaymentType>('creditCard');
+  const [selectedPayment, setSelectedPayment] =
+    useState<PaymentType>('creditCard');
   const [result, setResult] = useState<string>('');
 
   const handlePayment = () => {
