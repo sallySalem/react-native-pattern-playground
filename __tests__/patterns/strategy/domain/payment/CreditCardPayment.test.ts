@@ -1,5 +1,5 @@
-import { CreditCardPayment } from '../../../../../src/patterns/strategy/domain/payment/CreditCardPayment';
-import { PaymentResult } from '../../../../../src/patterns/strategy/domain/PaymentResult';
+import { CreditCardPayment } from '../../../../../src/patterns/behavioral/strategy/domain/payment/CreditCardPayment';
+import { PaymentResult } from '../../../../../src/patterns/behavioral/strategy/domain/PaymentResult';
 
 describe('CreditCardPayment', () => {
   let creditCard: CreditCardPayment;
@@ -37,4 +37,3 @@ describe('CreditCardPayment', () => {
     expect(result.message).toBe('Paid 9999.99 using Credit Card');
   });
 });
-

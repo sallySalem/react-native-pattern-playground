@@ -1,6 +1,6 @@
-import { CheckoutService } from '../../../../src/patterns/strategy/services/CheckoutService';
-import { PaymentStrategy } from '../../../../src/patterns/strategy/domain/PaymentStrategy';
-import { PaymentResult } from '../../../../src/patterns/strategy/domain/PaymentResult';
+import { CheckoutService } from '../../../../src/patterns/behavioral/strategy/services/CheckoutService';
+import { PaymentStrategy } from '../../../../src/patterns/behavioral/strategy/domain/PaymentStrategy';
+import { PaymentResult } from '../../../../src/patterns/behavioral/strategy/domain/PaymentResult';
 
 describe('CheckoutService', () => {
   let checkoutService: CheckoutService;
@@ -70,4 +70,3 @@ describe('CheckoutService', () => {
     expect(mockPaymentStrategy.pay).toHaveBeenNthCalledWith(3, 300);
   });
 });
-

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import StrategyScreen from '../../../../src/patterns/strategy/demo/StrategyScreen';
+import StrategyScreen from '../../../../src/patterns/behavioral/strategy/demo/StrategyScreen';
 
 describe('StrategyScreen', () => {
   it('should render without crashing', () => {
@@ -28,4 +28,3 @@ describe('StrategyScreen', () => {
     }).not.toThrow();
   });
 });
-

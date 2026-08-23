@@ -1,7 +1,7 @@
-import { PaymentStrategyFactory } from '../../../../src/patterns/strategy/factories/PaymentStrategyFactory';
-import { CreditCardPayment } from '../../../../src/patterns/strategy/domain/payment/CreditCardPayment';
-import { PaypalPayment } from '../../../../src/patterns/strategy/domain/payment/PaypalPayment';
-import { ApplePayPayment } from '../../../../src/patterns/strategy/domain/payment/ApplePayPayment';
+import { PaymentStrategyFactory } from '../../../../src/patterns/behavioral/strategy/factories/PaymentStrategyFactory';
+import { CreditCardPayment } from '../../../../src/patterns/behavioral/strategy/domain/payment/CreditCardPayment';
+import { PaypalPayment } from '../../../../src/patterns/behavioral/strategy/domain/payment/PaypalPayment';
+import { ApplePayPayment } from '../../../../src/patterns/behavioral/strategy/domain/payment/ApplePayPayment';
 
 describe('PaymentStrategyFactory', () => {
   it('should create CreditCardPayment strategy', () => {
@@ -32,8 +32,12 @@ describe('PaymentStrategyFactory', () => {
   });
 
   it('should create all payment types without errors', () => {
-    const types: Array<'creditCard' | 'paypal' | 'applePay'> = ['creditCard', 'paypal', 'applePay'];
-    types.forEach((type) => {
+    const types: Array<'creditCard' | 'paypal' | 'applePay'> = [
+      'creditCard',
+      'paypal',
+      'applePay',
+    ];
+    types.forEach(type => {
       expect(() => PaymentStrategyFactory.create(type)).not.toThrow();
     });
   });
@@ -43,4 +47,3 @@ describe('PaymentStrategyFactory', () => {
     expect(typeof strategy.pay).toBe('function');
   });
 });
-
