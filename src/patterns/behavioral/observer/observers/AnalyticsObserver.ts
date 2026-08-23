@@ -2,15 +2,13 @@ import { AuthState } from '../domain/AuthState.ts';
 import { Observer } from '../domain/Observer.ts';
 
 export class AnalyticsObserver implements Observer<AuthState> {
-  private lastTrackedState: AuthState = {
-    isLoggedIn: false,
-  };
+  private lastEvent = 'No event tracked';
 
   update(state: AuthState): void {
-    this.lastTrackedState = state;
+    this.lastEvent = state.isLoggedIn ? `LOGIN: ${state.username}` : 'LOGOUT';
   }
 
-  getState(): AuthState {
-    return this.lastTrackedState;
+  getLastEvent(): string {
+    return this.lastEvent;
   }
 }

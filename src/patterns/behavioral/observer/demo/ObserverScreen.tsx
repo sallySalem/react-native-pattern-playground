@@ -1,66 +1,66 @@
-import { useMemo, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { AuthSubject } from '../services/AuthSubject.ts';
 import { ProfileObserver } from '../observers/ProfileObserver.ts';
 import { AnalyticsObserver } from '../observers/AnalyticsObserver.ts';
 import { PaymentObserver } from '../observers/PaymentObserver.ts';
 import { Button, StyleSheet, Text, View } from 'react-native';
-import type { AuthState } from '../domain/AuthState.ts';
 
 export function ObserverScreen() {
-  const [authState, setAuthState] = useState<AuthState>({
-    isLoggedIn: false,
-  });
+  const authSubject = useRef(new AuthSubject()).current;
 
-  const observers = useMemo(() => {
-    const authSubject = new AuthSubject();
+  const profileObserver = useRef(new ProfileObserver()).current;
+  const analyticsObserver = useRef(new AnalyticsObserver()).current;
+  const paymentObserver = useRef(new PaymentObserver()).current;
 
-    const profileObserver = new ProfileObserver();
-    const analyticsObserver = new AnalyticsObserver();
-    const paymentObserver = new PaymentObserver();
+  const [, forceUpdate] = useState(0);
 
+  const login = () => {
+    authSubject.login('Sally');
+
+    forceUpdate(value => value + 1);
+  };
+
+  const logout = () => {
+    authSubject.logout();
+
+    forceUpdate(value => value + 1);
+  };
+
+  React.useEffect(() => {
     authSubject.subscribe(profileObserver);
     authSubject.subscribe(analyticsObserver);
     authSubject.subscribe(paymentObserver);
 
-    return {
-      authSubject,
-      profileObserver,
-      analyticsObserver,
-      paymentObserver,
+    return () => {
+      authSubject.unsubscribe(profileObserver);
+      authSubject.unsubscribe(analyticsObserver);
+      authSubject.unsubscribe(paymentObserver);
     };
-  }, []);
+  }, [authSubject, profileObserver, analyticsObserver, paymentObserver]);
 
-  const handleLogin = () => {
-    observers.authSubject.login('Sally');
-    // setAuthState(observers.profileObserver.getState());
-    setAuthState({
-      isLoggedIn: true,
-      username: 'Sally',
-    });
-  };
-
-  const handleLogout = () => {
-    observers.authSubject.logout();
-
-    setAuthState({
-      isLoggedIn: false,
-    });
-  };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Observer Pattern</Text>
 
-      <Text>Status: {authState.isLoggedIn ? 'Logged in' : 'Logged out'}</Text>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Authentication</Text>
 
-      <Button title="Login" onPress={handleLogin} />
+        <Button title="Login" onPress={login} />
 
-      <Button title="Logout" onPress={handleLogout} />
+        <Button title="Logout" onPress={logout} />
+      </View>
 
-      <Text style={styles.sectionTitle}>Observers</Text>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Observer Results</Text>
 
-      <Text>✓ Profile Observer</Text>
-      <Text>✓ Analytics Observer</Text>
-      <Text>✓ Payment Observer</Text>
+        <Text>Profile: {profileObserver.getMessage()}</Text>
+
+        <Text>Analytics: {analyticsObserver.getLastEvent()}</Text>
+
+        <Text>
+          Payment: {paymentObserver.isPaymentEnabled() ? 'Enabled' : 'Disabled'}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -77,8 +77,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
+  section: {
+    gap: 12,
+  },
+
   sectionTitle: {
-    marginTop: 24,
     fontSize: 18,
     fontWeight: '600',
   },

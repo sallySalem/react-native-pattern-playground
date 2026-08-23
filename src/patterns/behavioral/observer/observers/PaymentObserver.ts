@@ -2,15 +2,16 @@ import { Observer } from '../domain/Observer.ts';
 import { AuthState } from '../domain/AuthState.ts';
 
 export class PaymentObserver implements Observer<AuthState> {
-  private currentState: AuthState = {
-    isLoggedIn: false,
-  };
+  // private currentState: AuthState = {
+  //   isLoggedIn: false,
+  // };
+  private paymentEnabled = false;
 
   update(state: AuthState): void {
-    this.currentState = state;
+    this.paymentEnabled = state.isLoggedIn;
   }
 
-  getState(): AuthState {
-    return this.currentState;
+  isPaymentEnabled(): boolean {
+    return this.paymentEnabled;
   }
 }

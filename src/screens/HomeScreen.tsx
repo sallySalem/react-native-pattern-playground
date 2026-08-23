@@ -1,31 +1,24 @@
 import React from 'react';
-
 import { Button, StyleSheet, Text, View } from 'react-native';
-
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-
 import { RootStackParamList } from '../navigation/AppNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 const HomeScreen = ({ navigation }: Props) => {
   return (
-    <View>
-      <Text>React Native Pattern Playground</Text>
+    <View style={styles.container}>
+      <Text style={styles.sectionTitle}>React Native Pattern Playground</Text>
 
-      <View style={styles.button}>
-        <Button
-          title="Strategy Pattern"
-          onPress={() => navigation.navigate('Strategy')}
-        />
-      </View>
+      <Button
+        title="Strategy Pattern"
+        onPress={() => navigation.navigate('Strategy')}
+      />
 
-      <View style={styles.button}>
-        <Button
-          title="Observer Pattern"
-          onPress={() => navigation.navigate('Observer')}
-        />
-      </View>
+      <Button
+        title="Observer Pattern"
+        onPress={() => navigation.navigate('Observer')}
+      />
     </View>
   );
 };
@@ -33,7 +26,13 @@ const HomeScreen = ({ navigation }: Props) => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  button: {
-    marginTop: 24,
+  container: {
+    flex: 1,
+    padding: 24,
+    gap: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
   },
 });

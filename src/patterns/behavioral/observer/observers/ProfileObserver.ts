@@ -2,15 +2,17 @@ import { Observer } from '../domain/Observer.ts';
 import { AuthState } from '../domain/AuthState.ts';
 
 export class ProfileObserver implements Observer<AuthState> {
-  private currentUser: AuthState = {
-    isLoggedIn: false,
-  };
+  private message = 'Waiting for authentication update';
 
   update(state: AuthState): void {
-    this.currentUser = state;
+    if (state.isLoggedIn) {
+      this.message = `Profile updated for ${state.username}`;
+      return;
+    }
+    this.message = 'Profile cleared';
   }
 
-  getState(): AuthState {
-    return this.currentUser;
+  getMessage(): string {
+    return this.message;
   }
 }
