@@ -18,4 +18,22 @@ export class AuthSubject implements Subject<AuthState> {
   unsubscribe(observer: Observer<AuthState>): void {
     this.observers = this.observers.filter(obs => obs !== observer);
   }
+
+  login(username: string): void {
+    this.state = {
+      isLoggedIn: true,
+      username: username,
+    };
+
+    this.notify();
+  }
+
+  logout(): void {
+    this.state = {
+      isLoggedIn: false,
+      username: '',
+    };
+
+    this.notify();
+  }
 }
