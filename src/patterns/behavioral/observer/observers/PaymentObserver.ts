@@ -1,17 +1,27 @@
-import { Observer } from '../domain/Observer.ts';
-import { AuthState } from '../domain/AuthState.ts';
+import { AuthState } from '../model/AuthState';
+import { Observer } from './Observer.ts';
+import { ObservableState } from '../support/ObservableState.ts';
 
 export class PaymentObserver implements Observer<AuthState> {
-  // private currentState: AuthState = {
-  //   isLoggedIn: false,
-  // };
-  private paymentEnabled = false;
+  private enabled = false;
 
-  update(state: AuthState): void {
-    this.paymentEnabled = state.isLoggedIn;
+  private readonly observableState = new ObservableState();
+
+  update(data: AuthState): void {
+    this.enabled = data.isLoggedIn;
+
+    this.observableState.changed();
   }
 
-  isPaymentEnabled(): boolean {
-    return this.paymentEnabled;
+  subscribe(listener: () => void): () => void {
+    return this.observableState.subscribe(listener);
+  }
+
+  getVersion(): number {
+    return this.observableState.getVersion();
+  }
+
+  isEnabled(): boolean {
+    return this.enabled;
   }
 }
