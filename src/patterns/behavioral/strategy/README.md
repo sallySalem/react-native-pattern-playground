@@ -189,7 +189,7 @@ graph TD
     style C fill: #ffdddd
     style D fill: #ffdddd
     classDef problem fill: #ff6666, stroke: #cc0000
-    class A, B, C, D problem
+    class A,B,C,D problem
 ```
 
 **Issues:**
@@ -217,7 +217,7 @@ graph TD
     style D fill: #ffffcc
     style E fill: #ffffcc
     classDef success fill: #66ff66, stroke: #00cc00
-    class A, B, C, D, E success
+    class A,B,C,D,E success
 ```
 
 **Benefits:**
