@@ -1,65 +1,65 @@
-import React, { useRef, useState } from 'react';
-import { AuthSubject } from '../services/AuthSubject.ts';
-import { ProfileObserver } from '../observers/ProfileObserver.ts';
-import { AnalyticsObserver } from '../observers/AnalyticsObserver.ts';
-import { PaymentObserver } from '../observers/PaymentObserver.ts';
+import React, { useEffect, useMemo } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 
+import { AuthSubject } from '../subject/AuthSubject';
+
+import { ProfileObserver } from '../observers/ProfileObserver';
+import { AnalyticsObserver } from '../observers/AnalyticsObserver';
+import { PaymentObserver } from '../observers/PaymentObserver';
+
+import { useObserver } from '../react/useObserver';
+
 export function ObserverScreen() {
-  const authSubject = useRef(new AuthSubject()).current;
+  const subject = useMemo(() => new AuthSubject(), []);
 
-  const profileObserver = useRef(new ProfileObserver()).current;
-  const analyticsObserver = useRef(new AnalyticsObserver()).current;
-  const paymentObserver = useRef(new PaymentObserver()).current;
+  const profileObserver = useMemo(() => new ProfileObserver(), []);
+  const analyticsObserver = useMemo(() => new AnalyticsObserver(), []);
+  const paymentObserver = useMemo(() => new PaymentObserver(), []);
 
-  const [, forceUpdate] = useState(0);
+  const profile = useObserver(profileObserver);
+  const analytics = useObserver(analyticsObserver);
+  const payment = useObserver(paymentObserver);
 
-  const login = () => {
-    authSubject.login('Sally');
-
-    forceUpdate(value => value + 1);
-  };
-
-  const logout = () => {
-    authSubject.logout();
-
-    forceUpdate(value => value + 1);
-  };
-
-  React.useEffect(() => {
-    authSubject.subscribe(profileObserver);
-    authSubject.subscribe(analyticsObserver);
-    authSubject.subscribe(paymentObserver);
+  useEffect(() => {
+    subject.subscribe(profileObserver);
+    subject.subscribe(analyticsObserver);
+    subject.subscribe(paymentObserver);
 
     return () => {
-      authSubject.unsubscribe(profileObserver);
-      authSubject.unsubscribe(analyticsObserver);
-      authSubject.unsubscribe(paymentObserver);
+      subject.unsubscribe(profileObserver);
+      subject.unsubscribe(analyticsObserver);
+      subject.unsubscribe(paymentObserver);
     };
-  }, [authSubject, profileObserver, analyticsObserver, paymentObserver]);
+  }, [subject, profileObserver, analyticsObserver, paymentObserver]);
+
+  const handleLogin = () => {
+    subject.login('Sally');
+  };
+
+  const handleLogout = () => {
+    subject.logout();
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Observer Pattern</Text>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Authentication</Text>
+        <Text style={styles.heading}>Authentication</Text>
 
-        <Button title="Login" onPress={login} />
+        <Button title="Login" onPress={handleLogin} />
 
-        <Button title="Logout" onPress={logout} />
+        <Button title="Logout" onPress={handleLogout} />
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Observer Results</Text>
+        <Text style={styles.heading}>Observer Updates</Text>
 
-        <Text>Profile: {profileObserver.getMessage()}</Text>
+        <Text>Profile: {profile.getMessage()}</Text>
 
-        <Text>Analytics: {analyticsObserver.getLastEvent()}</Text>
+        <Text>Analytics: {analytics.getLastEvent()}</Text>
 
-        <Text>
-          Payment: {paymentObserver.isPaymentEnabled() ? 'Enabled' : 'Disabled'}
-        </Text>
+        <Text>Payment: {payment.isEnabled() ? 'Enabled' : 'Disabled'}</Text>
       </View>
     </View>
   );
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
 
-  sectionTitle: {
+  heading: {
     fontSize: 18,
     fontWeight: '600',
   },

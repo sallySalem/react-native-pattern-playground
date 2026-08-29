@@ -1,4 +1,4 @@
-import { Observer } from './Observer.ts';
+import { Observer } from '../observers/Observer.ts';
 
 export interface Subject<T> {
   subscribe(observer: Observer<T>): void;
