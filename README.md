@@ -60,7 +60,8 @@ Patterns that focus on communication between objects and how behavior can vary i
 | Pattern      | Example                                                                  | Status         |
 |--------------|--------------------------------------------------------------------------|----------------|
 | **Strategy** | [Dynamic Payment Processing](src/patterns/behavioral/strategy/README.md) | ✅ Available    |
-| Observer     | —                                                                        | 🚧 Coming soon |
+| **Observer** | [Authentication Event Notifications](/src/patterns/behavioral/observer/README.md)    | ✅ Available   |
+| TBD     | —                                                                        | 🚧 Coming soon |
 
 [//]: # (| Command | — | 🚧 Coming soon |)
 
