@@ -78,7 +78,7 @@ authentication.
 
 ### Problems With This Approach
 
-### 1. High Coupling
+#### 1. High Coupling
 
 The authentication logic knows about every consumer:
 
@@ -94,17 +94,13 @@ AuthService
 
 Adding or removing a consumer requires modifying the subject.
 
----
-
-### 2. Violates the Open/Closed Principle
+#### 2. Violates the Open/Closed Principle
 
 The authentication flow must repeatedly be modified whenever a new reaction is introduced.
 
 The subject is not stable.
 
----
-
-### 3. Too Many Responsibilities
+#### 3. Too Many Responsibilities
 
 The authentication service becomes responsible for:
 
@@ -117,17 +113,13 @@ The authentication service becomes responsible for:
 
 This makes the class harder to understand and maintain.
 
----
-
-### 4. Difficult Testing
+#### 4. Difficult Testing
 
 Testing authentication requires knowing about all the side effects triggered by authentication.
 
 Individual behaviors become harder to isolate.
 
----
-
-### 5. Difficult Runtime Configuration
+#### 5. Difficult Runtime Configuration
 
 The authentication service itself determines which consumers exist.
 
@@ -181,8 +173,6 @@ The subject does not need to know whether the observer is:
 
 It only depends on the `Observer` interface.
 
----
-
 ## Core Concept
 
 The Observer Pattern consists of two main roles.
@@ -224,8 +214,6 @@ PaymentObserver
 ```
 
 Each observer has its own independent reaction.
-
----
 
 ### Runtime Composition
 
@@ -296,8 +284,6 @@ subject.subscribe(paymentObserver);
 ```
 
 This keeps the subject independent from concrete behaviors.
-
----
 
 ### Composition Over Inheritance
 
@@ -375,8 +361,6 @@ ProfileObserver
 
 This is composition rather than inheritance.
 
----
-
 ### Program to an Interface, Not an Implementation
 
 The `AuthSubject` does not depend on:
@@ -424,8 +408,6 @@ The subject only knows:
 > "This object can receive an update."
 
 It does not care what the object does with it.
-
----
 
 ### Identify What Varies
 
@@ -537,8 +519,6 @@ observer/
 └── __tests__/
 ```
 
----
-
 ### React Native Integration
 
 The Observer Pattern itself does not depend on React.
@@ -588,9 +568,7 @@ The important distinction is:
 
 > The React integration only reflects those changes in the UI.
 
----
-
-## Adding a New Observer
+### Adding a New Observer
 
 Suppose we need an `ErrorReporter`.
 
@@ -625,8 +603,6 @@ switch
 is added to the subject.
 
 This is one of the main benefits of the pattern.
-
----
 
 ### Removing an Observer
 
@@ -767,7 +743,7 @@ Use Observer when:
 
 ---
 
-# When Not to Use Observer Pattern
+## When Not to Use Observer Pattern
 
 Avoid it when:
 
