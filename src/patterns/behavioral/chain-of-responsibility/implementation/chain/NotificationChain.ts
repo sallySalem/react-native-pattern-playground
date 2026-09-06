@@ -15,35 +15,24 @@ import { NotificationHandlingResult } from '../handlers/core/NotificationHandlin
 //   return new GeneralNotificationHandler(chatHandler);
 // }
 export function createNotificationChain(): NotificationHandler {
-  const general = new GeneralNotificationHandler();
-
-  const payment = new NotificationChain(
+  return new NotificationChain([
+    new DeepLinkNotificationHandler(),
+    new ChatNotificationHandler(),
     new PaymentNotificationHandler(),
-    general,
-  );
-
-  const chat = new NotificationChain(new ChatNotificationHandler(), payment);
-
-  return new NotificationChain(new DeepLinkNotificationHandler(), chat);
+    new GeneralNotificationHandler(),
+  ]);
 }
 
 export class NotificationChain implements NotificationHandler {
-  constructor(
-    private readonly current: NotificationHandler,
-    private readonly next?: NotificationHandler,
-  ) {}
-
-  canHandle(notification: Notification): boolean {
-    return this.current.canHandle(notification);
-  }
+  constructor(private readonly handlers: NotificationHandler[]) {}
 
   handle(notification: Notification): NotificationHandlingResult {
-    if (this.current.canHandle(notification)) {
-      return this.current.handle(notification);
-    }
+    for (const handler of this.handlers) {
+      const result = handler.handle(notification);
 
-    if (this.next) {
-      return this.next.handle(notification);
+      if (result.handled) {
+        return result;
+      }
     }
 
     return { handled: false };
