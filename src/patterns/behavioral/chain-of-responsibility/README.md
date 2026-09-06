@@ -2,102 +2,207 @@
 
 ## Overview
 
-The Chain of Responsibility is a behavioral pattern that passes a request along a chain of handlers
+The Chain of Responsibility is a **behavioral pattern** that passes a request along a chain of handlers
 until one of them handles it. This keeps each handler focused on a single responsibility and avoids
 large conditional blocks.
 
-This example shows how incoming notifications (chat, payment, deep-link, general) can be routed to
-the correct handler without a central switch/case.
+In this example, we use notifications:
 
-## Problem
+* Deep Link
+* Chat
+* Payment
+* General
+
+The sender only knows about the chain — not which handler will process the notification.
+
+## The Problem Without the Pattern
 
 Hardcoding if/else or switch statements to route notifications leads to code that is hard to extend and test.
 Every new notification type requires changing a central dispatcher.
 
-## Solution
+```typescript
+  if (notification.type === 'deep-link') {
+    // handle deep link 
+} else if (notification.type === 'chat') {
+    // handle chat 
+} else if (notification.type === 'payment') {
+    // handle payment 
+} else if (notification.type === 'general') {
+    // handle general 
+} else {
 
-Create independent handlers that know how to handle one notification type. Each handler decides whether
-it can process the incoming notification; if not, it passes the request to the next handler.
+}
+```
 
-Benefits:
+**Problems**
+
+* ❌ High coupling
+* ❌ Growing if/else logic
+* ❌ Harder to extend
+* ❌ Harder to test
+* ❌ One component knows every handler
+
+## Chain of Responsibility Solution
+
+Instead of one component knowing how to handle every notification, we create independent handlers.
+
+**Each handler either:**
+
+1. Handles the notification
+2. Passes it to the next handler
+
+**Benefits:**
 
 - Decouples routing logic from handling logic
 - Easy to add new handlers without modifying existing ones
 - Handlers are easy to unit-test
 
-## Project structure
+## Demo
 
-```
-src/patterns/behavioral/chain-of-responsibility/
-├── implementation/
-│   ├── domain/notification.ts        (Notification type)
-│   └── handlers/
-│       ├── NotificationHandler.ts    (Interface)
-│       ├── ChatNotificationHandler.ts
-│       ├── PaymentNotificationHandler.ts
-│       ├── DeepLinkNotificationHandler.ts
-│       └── GeneralNotificationHandler.ts
-└── demo/
-	└── ChainOfResponsibilityScreen.tsx
-```
-
-## Core types (quick)
-
-- `Notification` — union type describing incoming notifications
-- `NotificationHandler` — handler interface with `canHandle(notification): boolean` and `handle(notification): void`
+<p align="center">
+  <img src="./COR_Demo.gif" alt="Chain of Responsibility Demo" width="300" />
+</p>
 
 ## Simple flow (diagram)
 
 ```mermaid
-graph LR
-    A[Incoming Notification] --> B[ChatHandler]
-    B -->|canHandle = yes| Z[Handled by ChatHandler]
-    B -->|canHandle = no| C[PaymentHandler]
-    C -->|canHandle = yes| Z2[Handled by PaymentHandler]
-    C -->|canHandle = no| D[DeepLinkHandler]
-    D -->|canHandle = yes| Z3[Handled by DeepLinkHandler]
-    D -->|canHandle = no| E[GeneralHandler]
-    E -->|canHandle = yes| Z4[Handled by GeneralHandler]
-    E -->|canHandle = no| F[Unhandled]
+flowchart LR
+    N[Incoming Notification] --> D[DeepLink Handler]
+    D -->|handled| H1[Handled]
+    D -->|not handled| C[Chat Handler]
+    C -->|handled| H2[Handled]
+    C -->|not handled| P[Payment Handler]
+    P -->|handled| H3[Handled]
+    P -->|not handled| G[General Handler]
+    G -->|handled| H4[Handled]
+    G -->|not handled| U[Unhandled]
 ```
 
-## Sequence (runtime)
+---
+
+## Composition Over Inheritance
+
+The handlers do **not** inherit from a base handler.
+
+They all implement the same contract:
+
+```ts
+interface NotificationHandler {
+    handle(
+        notification: Notification
+    ): NotificationHandlingResult;
+}
+```
+
+The chain is composed from handlers:
+
+```ts
+new NotificationChain([
+    new DeepLinkNotificationHandler(),
+    new ChatNotificationHandler(),
+    new PaymentNotificationHandler(),
+    new GeneralNotificationHandler(),
+]);
+```
+
+This keeps the design flexible and avoids a rigid inheritance hierarchy.
+
+---
+
+## Architecture
 
 ```mermaid
-sequenceDiagram
-    participant UI as Notifier
-    participant H1 as ChatHandler
-    participant H2 as PaymentHandler
-    participant H3 as DeepLinkHandler
-    participant H4 as GeneralHandler
-    UI ->> H1: notify(notification)
-    H1 -->> H1: if canHandle -> handle()
-    H1 -->> H2: else pass to next
-    H2 -->> H2: if canHandle -> handle()
-    H2 -->> H3: else pass to next
-    H3 -->> H3: if canHandle -> handle()
-    H3 -->> H4: else pass to next
-    H4 -->> H4: if canHandle -> handle() else unhandled
+classDiagram
+    class NotificationHandler {
+        <<interface>>
+        +handle(notification) NotificationHandlingResult
+    }
+
+    class NotificationChain {
+        -handlers: NotificationHandler[]
+        +handle(notification) NotificationHandlingResult
+    }
+
+    class DeepLinkNotificationHandler
+    class ChatNotificationHandler
+    class PaymentNotificationHandler
+    class GeneralNotificationHandler
+
+    NotificationHandler <|.. DeepLinkNotificationHandler
+    NotificationHandler <|.. ChatNotificationHandler
+    NotificationHandler <|.. PaymentNotificationHandler
+    NotificationHandler <|.. GeneralNotificationHandler
+    NotificationChain --> NotificationHandler: composes
 ```
 
-## When to use
+The chain depends on the **abstraction**, not concrete handlers.
 
-- When multiple handlers may process a request and you want to decouple sender from receiver
-- When responsibility for processing should be dynamic or configurable at runtime
+---
+
+## Design Principles
+
+### 🔹 Loose Coupling
+
+The caller does not know which handler will process the notification.
+
+### 🔹 Composition Over Inheritance
+
+Handlers are composed into a chain instead of extending a base handler.
+
+### 🔹 Single Responsibility
+
+Each handler has one responsibility:
+
+```text
+DeepLinkHandler  → Deep Links
+ChatHandler      → Chat
+PaymentHandler   → Payments
+GeneralHandler   → General notifications
+```
+
+### 🔹 Open/Closed Principle
+
+New notification types can be added by creating a new handler without changing the existing handlers.
+
+### 🔹 Dependency Inversion
+
+The chain works with the `NotificationHandler` interface rather than concrete handler classes.
+
+### 🔹 Separation of Concerns
+
+The domain handles the request.
+
+The UI decides how the result should be displayed.
+
+```text
+Handler
+   ↓
+Domain Result
+   ↓
+UI
+   ↓
+getComponent()
+   ↓
+React Component
+```
+
+---
+
+## When to Use
+
+Use Chain of Responsibility when:
+
+- Multiple objects may handle the same request.
+- The sender should not know the specific handler.
+- Handling order matters.
+- You want to add or reorder handlers easily.
+- You want to avoid large conditional blocks.
 
 ## When not to use
 
 - If there is only one receiver or the routing logic is trivial
 - If you need guaranteed, ordered processing by all handlers (use Observer instead)
 
-## Notes about this implementation
-
-- `Notification` is defined in `implementation/domain/notification.ts` and exported for handlers.
-- `NotificationHandler` uses the primitive `boolean` for `canHandle` (not `Boolean`).
-- Handler implementations live under `implementation/handlers/` and should export a reference to the next handler
-  or be wired together by a small coordinator in `demo/`.
-
 ---
 
-If you'd like, I can also implement the concrete handlers and a small demo screen that wires the chain together.
 
