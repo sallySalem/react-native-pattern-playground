@@ -1,6 +1,6 @@
 # Chain of Responsibility — Notification Handling
 
-## Overview
+### Overview
 
 The Chain of Responsibility is a **behavioral pattern** that passes a request along a chain of handlers
 until one of them handles it. This keeps each handler focused on a single responsibility and avoids
@@ -42,6 +42,9 @@ Every new notification type requires changing a central dispatcher.
 * ❌ Harder to test
 * ❌ One component knows every handler
 
+<br />
+<br />
+
 ## Chain of Responsibility Solution
 
 Instead of one component knowing how to handle every notification, we create independent handlers.
@@ -63,6 +66,9 @@ Instead of one component knowing how to handle every notification, we create ind
   <img src="./COR_Demo.gif" alt="Chain of Responsibility Demo" width="300" />
 </p>
 
+<br />
+<br />
+
 ## Simple flow (diagram)
 
 ```mermaid
@@ -78,7 +84,7 @@ flowchart LR
     G -->|not handled| U[Unhandled]
 ```
 
----
+
 
 ## Composition Over Inheritance
 
@@ -107,7 +113,9 @@ new NotificationChain([
 
 This keeps the design flexible and avoids a rigid inheritance hierarchy.
 
----
+
+<br />
+<br />
 
 ## Architecture
 
@@ -137,7 +145,9 @@ classDiagram
 
 The chain depends on the **abstraction**, not concrete handlers.
 
----
+
+<br />
+<br />
 
 ## Design Principles
 
@@ -186,7 +196,9 @@ getComponent()
 React Component
 ```
 
----
+
+<br />
+<br />
 
 ## When to Use
 
@@ -203,6 +215,6 @@ Use Chain of Responsibility when:
 - If there is only one receiver or the routing logic is trivial
 - If you need guaranteed, ordered processing by all handlers (use Observer instead)
 
----
+
 
 
