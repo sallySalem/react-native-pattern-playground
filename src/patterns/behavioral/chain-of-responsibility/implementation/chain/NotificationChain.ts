@@ -4,6 +4,7 @@ import { GeneralNotificationHandler } from '../handlers/GeneralNotificationHandl
 import { PaymentNotificationHandler } from '../handlers/PaymentNotificationHandler.ts';
 import { ChatNotificationHandler } from '../handlers/ChatNotificationHandler.ts';
 import { DeepLinkNotificationHandler } from '../handlers/DeepLinkNotificationHandler.ts';
+import { NotificationHandlingResult } from '../handlers/core/NotificationHandlingResult.ts';
 // export function createNotificationChain(): NotificationHandler {
 //   const deeplinkHandler = new DeepLinkNotificationHandler();
 //
@@ -23,12 +24,7 @@ export function createNotificationChain(): NotificationHandler {
 
   const chat = new NotificationChain(new ChatNotificationHandler(), payment);
 
-  const deepLink = new NotificationChain(
-    new DeepLinkNotificationHandler(),
-    chat,
-  );
-
-  return deepLink;
+  return new NotificationChain(new DeepLinkNotificationHandler(), chat);
 }
 
 export class NotificationChain implements NotificationHandler {
@@ -41,7 +37,7 @@ export class NotificationChain implements NotificationHandler {
     return this.current.canHandle(notification);
   }
 
-  handle(notification: Notification): string {
+  handle(notification: Notification): NotificationHandlingResult {
     if (this.current.canHandle(notification)) {
       return this.current.handle(notification);
     }
@@ -50,6 +46,6 @@ export class NotificationChain implements NotificationHandler {
       return this.next.handle(notification);
     }
 
-    return 'Notification was not handled.';
+    return { handled: false };
   }
 }

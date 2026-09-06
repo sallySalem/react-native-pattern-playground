@@ -9,8 +9,14 @@ export function ChainOfResponsibilityScreen() {
   const [result, setResult] = useState<string>('');
 
   const handleNotification = (notification: Notification) => {
-    const response = chain.handle(notification);
-    setResult(response);
+    const result = chain.handle(notification);
+
+    if (!result.handled) {
+      setResult('Notification was not handled.');
+      return;
+    }
+
+    setResult(`Action: ${result.action}`);
   };
 
   return (
