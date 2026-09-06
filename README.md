@@ -33,7 +33,8 @@ graph TD
     A --> D["Structural Patterns"]
     B --> B1["Strategy"]
     B --> B2["Observer"]
-    B --> B3["..."]
+    B --> B3["Chain of Responsibility"]
+    B --> B4["..."]
 %%    B --> B3["Command"]
 %%    B --> B4["State"]
 %%    B --> B5["Chain of Responsibility"]
@@ -57,11 +58,12 @@ graph TD
 
 Patterns that focus on communication between objects and how behavior can vary independently.
 
-| Pattern      | Example                                                                  | Status         |
-|--------------|--------------------------------------------------------------------------|----------------|
-| **Strategy** | [Dynamic Payment Processing](src/patterns/behavioral/strategy/README.md) | ✅ Available    |
-| **Observer** | [Authentication Event Notifications](/src/patterns/behavioral/observer/README.md)    | ✅ Available   |
-| TBD     | —                                                                        | 🚧 Coming soon |
+| Pattern                     | Example                                                                            | Status         |
+|-----------------------------|------------------------------------------------------------------------------------|----------------|
+| **Strategy**                | [Dynamic Payment Processing](src/patterns/behavioral/strategy/README.md)           | ✅ Available    |
+| **Observer**                | [Authentication Event Notifications](/src/patterns/behavioral/observer/README.md)  | ✅ Available    |
+| **Chain of Responsibility** | [Notification Handling](src/patterns/behavioral/chain-of-responsibility/README.md) | ✅ Available    |
+| TBD                         | —                                                                                  | 🚧 Coming soon |
 
 [//]: # (| Command | — | 🚧 Coming soon |)
 
