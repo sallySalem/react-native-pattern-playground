@@ -19,6 +19,11 @@ const HomeScreen = ({ navigation }: Props) => {
         title="Observer Pattern"
         onPress={() => navigation.navigate('Observer')}
       />
+
+      <Button
+        title="Chain of Responsibility Pattern"
+        onPress={() => navigation.navigate('ChainOfResponsibility')}
+      />
     </View>
   );
 };
