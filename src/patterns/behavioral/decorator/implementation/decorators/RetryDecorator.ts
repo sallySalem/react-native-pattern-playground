@@ -5,7 +5,7 @@ export class RetryDecorator implements ApiService {
   constructor(
     private readonly service: ApiService,
     private readonly logger: Logger,
-    private readonly maxRetries: number = 2,
+    private readonly maxRetries = 1,
   ) {}
 
   async request(): Promise<string> {
@@ -13,13 +13,13 @@ export class RetryDecorator implements ApiService {
 
     for (let attempt = 1; attempt <= this.maxRetries + 1; attempt++) {
       try {
-        this.logger.log(`Retry: attempt ${attempt}`);
+        this.logger.log(`Retry → attempt ${attempt}`);
 
         return await this.service.request();
       } catch (error) {
         lastError = error;
 
-        this.logger.log(`Retry: attempt ${attempt} failed`);
+        this.logger.log(`Retry → attempt ${attempt} failed`);
       }
     }
 

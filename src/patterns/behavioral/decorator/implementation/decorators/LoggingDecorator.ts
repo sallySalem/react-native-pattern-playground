@@ -8,11 +8,11 @@ export class LoggingDecorator implements ApiService {
   ) {}
 
   async request(): Promise<string> {
-    this.logger.log('Logging: request started');
+    this.logger.log('Logging → request started');
 
     const result = await this.service.request();
 
-    this.logger.log('Logging: request finished');
+    this.logger.log('Logging → request finished');
 
     return result;
   }

@@ -8,11 +8,11 @@ export class AnalyticsDecorator implements ApiService {
   ) {}
 
   async request(): Promise<string> {
-    this.logger.log('Analytics: request started');
+    this.logger.log('Analytics → request started');
 
     const result = await this.service.request();
 
-    this.logger.log('Analytics: success');
+    this.logger.log('Analytics → success');
 
     return result;
   }

@@ -1,15 +1,19 @@
+import { AnalyticsDecorator } from '../implementation/decorators/AnalyticsDecorator';
+import { LoggingDecorator } from '../implementation/decorators/LoggingDecorator';
+import { RetryDecorator } from '../implementation/decorators/RetryDecorator';
 import { InMemoryLogger } from '../implementation/InMemoryLogger';
-import { UserApiService } from '../implementation/UserApiService.ts';
-import { RetryDecorator } from '../implementation/decorators/RetryDecorator.ts';
-import { LoggingDecorator } from '../implementation/decorators/LoggingDecorator.ts';
-import { AnalyticsDecorator } from '../implementation/decorators/AnalyticsDecorator.ts';
+import { UserApiService } from '../implementation/UserApiService';
 
-export const createDecoratorDemoService = () => {
+import { DemoApiService, DemoScenario } from './DemoApiService';
+
+export const createDecoratorDemoService = (scenario: DemoScenario) => {
   const logger = new InMemoryLogger();
 
-  const baseService = new UserApiService();
+  const userApi = new UserApiService();
 
-  const retryService = new RetryDecorator(baseService, logger);
+  const demoApi = new DemoApiService(userApi, logger, scenario);
+
+  const retryService = new RetryDecorator(demoApi, logger);
 
   const loggingService = new LoggingDecorator(retryService, logger);
 

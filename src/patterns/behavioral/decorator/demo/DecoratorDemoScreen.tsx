@@ -1,109 +1,153 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View, } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View, } from 'react-native';
 
 import { createDecoratorDemoService } from './createDecoratorDemoService';
 
-type PipelineStep = {
-  id: string;
-  label: string;
-  type: 'decorator' | 'component';
+import { DemoScenario } from './DemoApiService';
+
+import { playExecution } from './playExecution';
+
+type PipelineStep = 'analytics' | 'logging' | 'retry' | 'user-api';
+
+const DEMO_DELAY = 1000;
+
+const getStepFromMessage = (message: string): PipelineStep | null => {
+  if (message.startsWith('Analytics')) {
+    return 'analytics';
+  }
+
+  if (message.startsWith('Logging')) {
+    return 'logging';
+  }
+
+  if (message.startsWith('Retry')) {
+    return 'retry';
+  }
+
+  if (message.startsWith('User API')) {
+    return 'user-api';
+  }
+
+  return null;
 };
 
-const PIPELINE: PipelineStep[] = [
-  {
-    id: 'analytics',
-    label: 'AnalyticsDecorator',
-    type: 'decorator',
-  },
-  {
-    id: 'logging',
-    label: 'LoggingDecorator',
-    type: 'decorator',
-  },
-  {
-    id: 'retry',
-    label: 'RetryDecorator',
-    type: 'decorator',
-  },
-  {
-    id: 'service',
-    label: 'UserApiService',
-    type: 'component',
-  },
-];
-
-const PipelineNode = ({
-  step,
-  active,
+const PipelineItem = ({
+  label,
+  active = false,
+  component = false,
 }: {
-  step: PipelineStep;
-  active: boolean;
-}) => {
-  return (
-    <View style={[styles.pipelineNode, active && styles.pipelineNodeActive]}>
-      <Text style={styles.pipelineType}>
-        {step.type === 'decorator' ? 'DECORATOR' : 'CONCRETE COMPONENT'}
+  label: string;
+  active?: boolean;
+  component?: boolean;
+}) => (
+  <View
+    style={[
+      styles.pipelineItem,
+      component && styles.componentItem,
+      active && styles.pipelineItemActive,
+    ]}
+  >
+    <View style={styles.pipelineContent}>
+      {active && <ActivityIndicator size="small" />}
+
+      <Text style={[styles.pipelineText, active && styles.pipelineTextActive]}>
+        {label}
       </Text>
+    </View>
+  </View>
+);
+
+const Arrow = () => <Text style={styles.arrow}>→</Text>;
+
+const ScenarioButton = ({
+  label,
+  scenario,
+  selectedScenario,
+  disabled,
+  onPress,
+}: {
+  label: string;
+  scenario: DemoScenario;
+  selectedScenario: DemoScenario;
+  disabled: boolean;
+  onPress: () => void;
+}) => {
+  const selected = scenario === selectedScenario;
+
+  return (
+    <Pressable
+      style={styles.scenarioButton}
+      onPress={onPress}
+      disabled={disabled}
+    >
+      <View style={[styles.radio, selected && styles.radioActive]} />
 
       <Text
-        style={[styles.pipelineTitle, active && styles.pipelineTitleActive]}
+        style={[styles.scenarioText, selected && styles.scenarioTextActive]}
       >
-        {step.label}
+        {label}
       </Text>
-
-      {active && <Text style={styles.executingText}>● Executing...</Text>}
-    </View>
+    </Pressable>
   );
 };
 
 export const DecoratorDemoScreen = () => {
-  const [demo] = useState(() => createDecoratorDemoService());
+  const [scenario, setScenario] = useState<DemoScenario>('success-second');
 
-  const { service, logger } = demo;
+  const [activeStep, setActiveStep] = useState<PipelineStep | null>(null);
 
   const [logs, setLogs] = useState<string[]>([]);
+
   const [isRunning, setIsRunning] = useState(false);
 
-  const [activeStep, setActiveStep] = useState<string | null>(null);
-
   const [result, setResult] = useState<string | null>(null);
-
-  useEffect(() => {
-    return logger.subscribe(messages => {
-      setLogs(messages);
-    });
-  }, [logger]);
 
   const handleRun = async () => {
     if (isRunning) {
       return;
     }
 
-    logger.clear();
+    setLogs([]);
+    setActiveStep(null);
     setResult(null);
-    setActiveStep('analytics');
     setIsRunning(true);
 
+    const demo = createDecoratorDemoService(scenario);
+
     try {
-      const requestPromise = service.request();
+      const data = await demo.service.request();
 
-      await new Promise(resolve => setTimeout(resolve, 350));
+      const messages = demo.logger.getMessages();
 
-      setActiveStep('logging');
+      await playExecution(messages, DEMO_DELAY, message => {
+        const currentStep = getStepFromMessage(message);
 
-      await new Promise(resolve => setTimeout(resolve, 350));
+        if (!currentStep) {
+          return;
+        }
 
-      setActiveStep('retry');
+        setLogs(previous => [...previous, message]);
 
-      const data = await requestPromise;
-
-      setActiveStep('service');
-
-      await new Promise(resolve => setTimeout(resolve, 500));
+        setActiveStep(currentStep);
+      });
 
       setResult(data);
     } catch {
+      const messages = demo.logger.getMessages();
+
+      await playExecution(messages, DEMO_DELAY, message => {
+        const currentStep = getStepFromMessage(message);
+
+        if (!currentStep) {
+          return;
+        }
+
+        setLogs(previous => [...previous, message]);
+
+        setActiveStep(currentStep);
+      });
+
       setResult('Request failed');
     } finally {
       setActiveStep(null);
@@ -112,248 +156,287 @@ export const DecoratorDemoScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Decorator Pattern</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Decorator Pattern</Text>
 
-        <Text style={styles.subtitle}>
-          Watch responsibilities being added through runtime composition.
-        </Text>
+      <Text style={styles.subtitle}>
+        Follow the request through the decorator chain.
+      </Text>
+
+      <View style={styles.pipeline}>
+        <PipelineItem label="Analytics" active={activeStep === 'analytics'} />
+
+        <Arrow />
+
+        <PipelineItem label="Logging" active={activeStep === 'logging'} />
+
+        <Arrow />
+
+        <PipelineItem label="Retry" active={activeStep === 'retry'} />
+
+        <Arrow />
+
+        <PipelineItem
+          label="User API"
+          component
+          active={activeStep === 'user-api'}
+        />
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Runtime Composition</Text>
+      <Text style={styles.sectionTitle}>Request scenario</Text>
 
-        <Text style={styles.sectionDescription}>
-          Each decorator wraps the same ApiService abstraction.
-        </Text>
+      <View style={styles.scenarioRow}>
+        <ScenarioButton
+          label="Success"
+          scenario="success-first"
+          selectedScenario={scenario}
+          disabled={isRunning}
+          onPress={() => setScenario('success-first')}
+        />
 
-        {PIPELINE.map((step, index) => (
-          <React.Fragment key={step.id}>
-            <PipelineNode step={step} active={activeStep === step.id} />
+        <ScenarioButton
+          label="Retry → Success"
+          scenario="success-second"
+          selectedScenario={scenario}
+          disabled={isRunning}
+          onPress={() => setScenario('success-second')}
+        />
 
-            {index < PIPELINE.length - 1 && <Text style={styles.arrow}>↓</Text>}
-          </React.Fragment>
-        ))}
+        <ScenarioButton
+          label="Retry → Fail"
+          scenario="fail-second"
+          selectedScenario={scenario}
+          disabled={isRunning}
+          onPress={() => setScenario('fail-second')}
+        />
       </View>
 
       <Pressable
+        style={[styles.runButton, isRunning && styles.runButtonDisabled]}
         onPress={handleRun}
         disabled={isRunning}
-        style={[styles.runButton, isRunning && styles.runButtonDisabled]}
       >
-        {isRunning ? (
-          <>
-            <ActivityIndicator />
-            <Text style={styles.runButtonText}>Running...</Text>
-          </>
-        ) : (
-          <Text style={styles.runButtonText}>▶ Run Request</Text>
-        )}
+        <Text style={styles.runButtonText}>
+          {isRunning ? 'Running...' : '▶  Run Request'}
+        </Text>
       </Pressable>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Live Execution</Text>
+      <Text style={styles.sectionTitle}>Live Execution</Text>
 
-        <View style={styles.executionPanel}>
-          {logs.length === 0 ? (
-            <Text style={styles.emptyText}>
-              Press "Run Request" to see the decorator chain execute.
-            </Text>
-          ) : (
-            logs.map((log, index) => (
-              <View key={`${log}-${index}`} style={styles.logRow}>
-                <Text style={styles.logCheck}>✓</Text>
+      <View style={styles.execution}>
+        {logs.length === 0 ? (
+          <Text style={styles.emptyText}>
+            Run the request to see the execution flow.
+          </Text>
+        ) : (
+          logs.map((message, index) => (
+            <View key={`${message}-${index}`} style={styles.logRow}>
+              <Text style={styles.stepNumber}>{index + 1}</Text>
 
-                <Text style={styles.logText}>{log}</Text>
-              </View>
-            ))
-          )}
-
-          {isRunning && (
-            <View style={styles.liveRow}>
-              <ActivityIndicator size="small" />
-
-              <Text style={styles.liveText}>Processing request...</Text>
+              <Text
+                style={[
+                  styles.logText,
+                  index === logs.length - 1 && styles.currentLog,
+                ]}
+              >
+                {message}
+              </Text>
             </View>
-          )}
-        </View>
+          ))
+        )}
       </View>
 
       {result && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Result</Text>
+        <View style={styles.result}>
+          <Text style={styles.resultLabel}>Result</Text>
 
-          <View style={styles.resultCard}>
-            <Text style={styles.resultIcon}>✓</Text>
-
-            <View style={styles.resultContent}>
-              <Text style={styles.resultLabel}>Request completed</Text>
-
-              <Text style={styles.resultText}>{result}</Text>
-            </View>
-          </View>
+          <Text style={styles.resultText}>{result}</Text>
         </View>
       )}
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    gap: 20,
-  },
-
-  header: {
-    gap: 8,
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 8,
+    backgroundColor: '#FFFFFF',
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 21,
+    fontWeight: '800',
+    marginBottom: 2,
   },
 
   subtitle: {
-    fontSize: 16,
-    lineHeight: 23,
+    fontSize: 12,
+    color: '#666666',
+    marginBottom: 10,
   },
 
-  section: {
-    gap: 10,
+  pipeline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
 
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-  },
-
-  sectionDescription: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-
-  pipelineNode: {
-    padding: 16,
+  pipelineItem: {
+    flex: 1,
+    minHeight: 42,
     borderWidth: 1,
-    borderRadius: 12,
-    gap: 5,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
   },
 
-  pipelineNodeActive: {
+  componentItem: {
+    borderStyle: 'dashed',
+  },
+
+  pipelineItemActive: {
     borderWidth: 2,
+    backgroundColor: '#E8F0FE',
   },
 
-  pipelineType: {
+  pipelineContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+  },
+
+  pipelineText: {
     fontSize: 11,
-    fontWeight: '700',
-  },
-
-  pipelineTitle: {
-    fontSize: 17,
     fontWeight: '600',
-  },
-
-  pipelineTitleActive: {
-    fontWeight: '800',
-  },
-
-  executingText: {
-    marginTop: 4,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-
-  arrow: {
-    fontSize: 24,
     textAlign: 'center',
   },
 
+  pipelineTextActive: {
+    fontWeight: '800',
+  },
+
+  arrow: {
+    fontSize: 15,
+    marginHorizontal: 2,
+  },
+
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+
+  scenarioRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 7,
+  },
+
+  scenarioButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 14,
+    marginBottom: 4,
+    paddingVertical: 3,
+  },
+
+  radio: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 2,
+    marginRight: 5,
+  },
+
+  radioActive: {
+    backgroundColor: '#222222',
+    borderWidth: 4,
+  },
+
+  scenarioText: {
+    fontSize: 11,
+    color: '#555555',
+  },
+
+  scenarioTextActive: {
+    fontWeight: '700',
+    color: '#222222',
+  },
+
   runButton: {
-    minHeight: 52,
-    borderRadius: 12,
+    minHeight: 40,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 10,
+    marginBottom: 10,
+    borderWidth: 1,
   },
 
   runButtonDisabled: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
 
   runButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
   },
 
-  executionPanel: {
+  execution: {
+    minHeight: 150,
     borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
-    gap: 12,
-    minHeight: 120,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    marginBottom: 8,
   },
 
   emptyText: {
-    fontSize: 14,
-    lineHeight: 20,
+    color: '#888888',
+    fontSize: 12,
+    lineHeight: 17,
   },
 
   logRow: {
     flexDirection: 'row',
-    gap: 10,
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    marginBottom: 5,
   },
 
-  logCheck: {
-    fontSize: 15,
+  stepNumber: {
+    width: 20,
+    fontSize: 11,
     fontWeight: '700',
+    color: '#888888',
   },
 
   logText: {
     flex: 1,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 12,
+    color: '#444444',
   },
 
-  liveRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+  currentLog: {
+    fontWeight: '800',
   },
 
-  liveText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-
-  resultCard: {
+  result: {
     borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    gap: 12,
-    alignItems: 'center',
-  },
-
-  resultIcon: {
-    fontSize: 20,
-    fontWeight: '700',
-  },
-
-  resultContent: {
-    flex: 1,
-    gap: 4,
+    borderRadius: 8,
+    padding: 8,
   },
 
   resultLabel: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
+    marginBottom: 2,
   },
 
   resultText: {
-    fontSize: 17,
-    fontWeight: '700',
+    fontSize: 12,
   },
 });
