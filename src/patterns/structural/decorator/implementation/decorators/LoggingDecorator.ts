@@ -1,5 +1,5 @@
-import { ApiService } from '../ApiService';
-import { Logger } from '../Logger';
+import { ApiService } from '../ApiService.ts';
+import { Logger } from '../Logger.ts';
 
 export class LoggingDecorator implements ApiService {
   constructor(

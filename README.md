@@ -60,9 +60,9 @@ Patterns that focus on communication between objects and how behavior can vary i
 
 | Pattern                     | Example                                                                            | Status         |
 |-----------------------------|------------------------------------------------------------------------------------|----------------|
-| **Strategy**                | [Dynamic Payment Processing](src/patterns/behavioral/strategy/README.md)           | ✅ Available    |
-| **Observer**                | [Authentication Event Notifications](/src/patterns/behavioral/observer/README.md)  | ✅ Available    |
-| **Chain of Responsibility** | [Notification Handling](src/patterns/behavioral/chain-of-responsibility/README.md) | ✅ Available    |
+| **Strategy**                | [Dynamic Payment Processing](src/patterns/behavioral/strategy/README.md)           | ✅ Available   |
+| **Observer**                | [Authentication Event Notifications](/src/patterns/behavioral/observer/README.md)  | ✅ Available   |
+| **Chain of Responsibility** | [Notification Handling](src/patterns/behavioral/chain-of-responsibility/README.md) | ✅ Available   |
 | TBD                         | —                                                                                  | 🚧 Coming soon |
 
 [//]: # (| Command | — | 🚧 Coming soon |)
@@ -104,8 +104,10 @@ Patterns that focus on object creation and initialization.
 
 Patterns that focus on how objects and classes are composed.
 
-| Pattern | Example | Status |
-|---------|---------|--------|
+| Pattern       | Example                                                             | Status         |
+|---------------|---------------------------------------------------------------------|----------------|
+| **Decorator** | [API Service Behavior](src/patterns/structural/decorator/README.md) | ✅ Available   |
+| TBD           | —                                                                   | 🚧 Coming soon |
 
 [//]: # (| Adapter | — | 🚧 Coming soon |)
 

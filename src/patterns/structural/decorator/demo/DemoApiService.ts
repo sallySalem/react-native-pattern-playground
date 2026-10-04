@@ -1,5 +1,5 @@
-import { ApiService } from '../implementation/ApiService';
-import { Logger } from '../implementation/Logger';
+import { ApiService } from '../implementation/ApiService.ts';
+import { Logger } from '../implementation/Logger.ts';
 
 export type DemoScenario = 'success-first' | 'success-second' | 'fail-second';
 

@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 
-import { ActivityIndicator, Pressable, StyleSheet, Text, View, } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
-import { createDecoratorDemoService } from './createDecoratorDemoService';
+import { createDecoratorDemoService } from './createDecoratorDemoService.ts';
 
-import { DemoScenario } from './DemoApiService';
+import { DemoScenario } from './DemoApiService.ts';
 
-import { playExecution } from './playExecution';
+import { playExecution } from './playExecution.ts';
 
 type PipelineStep = 'analytics' | 'logging' | 'retry' | 'user-api';
 

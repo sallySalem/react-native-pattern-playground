@@ -6,7 +6,7 @@ import HomeScreen from '../screens/HomeScreen';
 import StrategyScreen from '../patterns/behavioral/strategy/demo/StrategyScreen';
 import { ObserverScreen } from '../patterns/behavioral/observer/demo/ObserverScreen.tsx';
 import { ChainOfResponsibilityScreen } from '../patterns/behavioral/chain-of-responsibility/demo/ChainOfResponsibilityScreen.tsx';
-import { DecoratorDemoScreen } from '../patterns/behavioral/decorator/demo/DecoratorDemoScreen.tsx';
+import { DecoratorDemoScreen } from '../patterns/structural/decorator/demo/DecoratorDemoScreen.tsx';
 
 export type RootStackParamList = {
   Home: undefined;
