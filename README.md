@@ -44,13 +44,13 @@ graph TD
 %%    C --> C3["Builder"]
 %%    C --> C4["Prototype"]
 %%    C --> C5["Singleton"]
-    D --> D1["..."]
 %%    D --> D1["Adapter"]
 %%    D --> D2["Bridge"]
 %%    D --> D3["Composite"]
-%%    D --> D4["Decorator"]
+    D --> D4["Decorator"]
 %%    D --> D5["Facade"]
 %%    D --> D6["Proxy"]
+    D --> D1["..."]
 
 ```
 
