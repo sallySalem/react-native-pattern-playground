@@ -11,26 +11,14 @@ composition), not **which** behaviors are added (such as analytics, logging, or 
 This example is stored under the repository's `behavioral` patterns directory, but Decorator is classified as a
 **structural** pattern.
 
-This example decorates an API service with:
+This example composes an API service with three behaviors:
 
-- Analytics
+- Analytics (represented by demo log messages)
 - Logging
 - Retry
 
-Each decorator implements the same `ApiService` interface as the service it wraps. The caller can keep using the
-`ApiService` contract without knowing which decorators are in the chain.
-
-```text
-AnalyticsDecorator
-        ↓
-LoggingDecorator
-        ↓
-RetryDecorator
-        ↓
-DemoApiService (demo only)
-        ↓
-UserApiService
-```
+Each decorator implements the same `ApiService` interface as the service it wraps, so callers can use the same
+contract regardless of which decorators are composed.
 
 `DemoApiService` is an extra layer used only to simulate outcomes in the interactive demo; it is not one of the three
 behavior decorators. `UserApiService` is the base service in this example.
@@ -104,22 +92,55 @@ const analyticsService = new AnalyticsDecorator(loggingService, logger);
 await analyticsService.request();
 ```
 
-Conceptually, the composition is:
-
-```text
-Analytics(
-  Logging(
-    Retry(
-      DemoApiService(
-        UserApiService
-      )
-    )
-  )
-)
-```
-
 Every outer wrapper is still an `ApiService`, so the caller uses the same `request()` operation regardless of how many
 decorators are composed.
+
+## Demo
+
+The React Native demo visualizes the request moving through the decorator chain:
+
+<p align="center">
+  <img src="./decorator_demo.gif" alt="Decorator Pattern demo showing an API request moving through Analytics, Logging, Retry, and User API" width="300" />
+</p>
+
+The screen lets you choose a scenario, run the request, and watch the recorded execution trace and active pipeline step.
+The request finishes before the buffered log messages are replayed with a delay; the trace is a visualization, not live
+instrumentation. See [`DecoratorDemoScreen.tsx`](./demo/DecoratorDemoScreen.tsx).
+
+### Scenarios
+
+**Success**
+
+The simulated API succeeds on the first attempt:
+
+```text
+Analytics → Logging → Retry (attempt 1) → User API → Success
+```
+
+**Retry → Success**
+
+The demo API fails on its first attempt and succeeds on its second:
+
+```text
+Analytics → Logging → Retry
+                          ├── attempt 1 → failure
+                          └── attempt 2 → User API → Success
+```
+
+**Retry → Fail**
+
+The demo API fails on both attempts; the request rejects and the UI displays `Request failed`:
+
+```text
+Analytics → Logging → Retry
+                          ├── attempt 1 → failure
+                          └── attempt 2 → failure → Request failed
+```
+
+The demo's retry decorator is configured with its default `maxRetries` value of `1`: that means **one retry after the
+initial request**, or at most two attempts total. The scenario behavior is implemented by [
+`DemoApiService.ts`](./demo/DemoApiService.ts) and assembled in [
+`createDecoratorDemoService.ts`](./demo/createDecoratorDemoService.ts).
 
 ## How It Works
 
@@ -160,14 +181,6 @@ export class LoggingDecorator implements ApiService {
 }
 ```
 
-The decorator both **is an** `ApiService` (it implements the interface) and **has an** `ApiService` (it wraps one):
-
-```text
-LoggingDecorator
-    ├── IS-A → ApiService
-    └── HAS-A → ApiService
-```
-
 ## Core Structure
 
 The pattern is built from a component abstraction, a concrete component, and one or more decorators:
@@ -180,8 +193,8 @@ The pattern is built from a component abstraction, a concrete component, and one
 | Demo adapter            | `DemoApiService`                                           | Simulates outcomes for the demo; it is not one of the behavior decorators |
 | Client/composition root | `createDecoratorDemoService`                               | Creates and wires the service chain                                       |
 
-The key constraint is that both the concrete component and every decorator are usable through the same `ApiService`
-interface. That shared contract is what allows decorators to be nested and replaced transparently.
+The shared `ApiService` contract lets callers use the base service or any decorator in the same way. The next section
+explains the key IS-A and HAS-A relationships that make this composition possible.
 
 ## The Important Relationship: IS-A + HAS-A
 
@@ -253,53 +266,6 @@ object decorator when you need to add a composable behavior to an `ApiService`, 
 consumed by the UI. A React app can use both: decorators compose service behavior, and a Hook can call the resulting
 service and expose its state to a component.
 
-## Demo
-
-The React Native demo visualizes the request moving through the decorator chain:
-
-<p align="center">
-  <img src="./decorator_demo.gif" alt="Decorator Pattern demo showing an API request moving through Analytics, Logging, Retry, and User API" width="300" />
-</p>
-
-The screen lets you choose a scenario, run the request, and watch the recorded execution trace and active pipeline step.
-The request finishes before the buffered log messages are replayed with a delay; the trace is a visualization, not live
-instrumentation. See [`DecoratorDemoScreen.tsx`](./demo/DecoratorDemoScreen.tsx).
-
-### Scenarios
-
-**Success**
-
-The simulated API succeeds on the first attempt:
-
-```text
-Analytics → Logging → Retry (attempt 1) → User API → Success
-```
-
-**Retry → Success**
-
-The demo API fails on its first attempt and succeeds on its second:
-
-```text
-Analytics → Logging → Retry
-                          ├── attempt 1 → failure
-                          └── attempt 2 → User API → Success
-```
-
-**Retry → Fail**
-
-The demo API fails on both attempts; the request rejects and the UI displays `Request failed`:
-
-```text
-Analytics → Logging → Retry
-                          ├── attempt 1 → failure
-                          └── attempt 2 → failure → Request failed
-```
-
-The demo's retry decorator is configured with its default `maxRetries` value of `1`: that means **one retry after the
-initial request**, or at most two attempts total. The scenario behavior is implemented by [
-`DemoApiService.ts`](./demo/DemoApiService.ts) and assembled in [
-`createDecoratorDemoService.ts`](./demo/createDecoratorDemoService.ts).
-
 ## Composition Over Inheritance
 
 Without decorators, adding every possible combination can lead to classes such as:
@@ -312,19 +278,8 @@ AnalyticsLoggingRetryUserApiService
 ...
 ```
 
-Instead, compose the behaviors that are needed:
-
-```ts
-new AnalyticsDecorator(
-    new LoggingDecorator(
-        new RetryDecorator(demoApi, logger),
-        logger,
-    ),
-    logger,
-);
-```
-
-This avoids a subclass for each combination and lets the same decorator wrap different `ApiService` implementations.
+The composed service example above shows how to combine only the behaviors that are needed. This avoids a subclass
+for every combination and lets the same decorator wrap different `ApiService` implementations.
 
 ## Design and Object-Oriented Principles
 
@@ -335,7 +290,7 @@ Each class has one primary responsibility:
 ```text
 UserApiService       → Provides the API service implementation
 AnalyticsDecorator   → Logs demo analytics messages (a stand-in for analytics integration)
-LoggingDecorator     → Logs request start and completion
+LoggingDecorator     → Logs request start and successful completion
 RetryDecorator       → Retries a failed request
 DemoApiService       → Simulates outcomes for the interactive demo
 ```
@@ -391,10 +346,6 @@ Demo setup and scenario
 React Native screen
 ```
 
-### Composition Over Inheritance
-
-Behaviors are combined by wrapping objects rather than creating a deep or combinatorial inheritance hierarchy.
-
 ## Why Decorator Order Matters
 
 The demo composes the services in [`createDecoratorDemoService.ts`](./demo/createDecoratorDemoService.ts):
@@ -409,39 +360,42 @@ decorators. Moving a decorator to another position can change which work is repe
 
 Choose the order based on the intended behavior; there is no universally correct order for every set of decorators.
 
-## Final Architecture
+## Architecture
 
 ```mermaid
 flowchart TD
     Client[DecoratorDemoScreen]
     Factory[createDecoratorDemoService]
-    A[AnalyticsDecorator]
-    L[LoggingDecorator]
-    R[RetryDecorator]
+    A[AnalyticsDecorator<br/>service decorator]
+    L[LoggingDecorator<br/>service decorator]
+    R[RetryDecorator<br/>service decorator]
     D[DemoApiService<br/>demo-only outcome simulation]
     U[UserApiService<br/>base implementation]
-    Logger[InMemoryLogger<br/>buffered messages]
+    Logger[Logger<br/>logging interface]
+    MemoryLogger[InMemoryLogger<br/>demo message buffer]
     Replay[playExecution<br/>replays trace after request]
     Client -->|select scenario and request| Factory
     Factory -->|returns composed ApiService| A
+    Factory -->|creates| MemoryLogger
     A -->|delegates to| L
     L -->|delegates to| R
     R -->|delegates / retries| D
     D -->|delegates| U
-    A -.->|logs demo analytics messages| Logger
-    L -.->|logs request messages| Logger
-    R -.->|logs attempts and failures| Logger
-    D -.->|logs simulated API request| Logger
-    Client -->|reads buffered messages| Logger
-    Logger --> Replay
+    A -.->|writes messages through| Logger
+    L -.->|writes messages through| Logger
+    R -.->|writes messages through| Logger
+    D -.->|writes messages through| Logger
+    Logger -->|implemented by| MemoryLogger
+    Client -->|reads buffered messages| MemoryLogger
+    MemoryLogger --> Replay
     Replay -->|updates displayed trace| Client
 ```
 
-The solid arrows show service composition and delegation. The dashed arrows show the demo's buffered logging path.
-`DemoApiService` is included because the demo uses it to simulate the selected scenario; the base service in the
-conceptual Decorator example remains `UserApiService`.
+Solid arrows show service composition, delegation, and demo trace replay. Dashed arrows show logging: the service
+decorators and `DemoApiService` write messages through the `Logger` interface, while `InMemoryLogger` stores them for
+the demo. `LoggingDecorator` is a service wrapper; it is not the logger or the message store.
 
-All service-chain components share the same abstraction:
+The flowchart shows runtime composition and demo logging. This class diagram focuses on the type relationships:
 
 ```mermaid
 classDiagram
@@ -455,16 +409,26 @@ classDiagram
     class AnalyticsDecorator
     class LoggingDecorator
     class RetryDecorator
+    class Logger {
+        <<interface>>
+        +log(message) void
+    }
+    class InMemoryLogger
 
     ApiService <|.. UserApiService
     ApiService <|.. DemoApiService
     ApiService <|.. AnalyticsDecorator
     ApiService <|.. LoggingDecorator
     ApiService <|.. RetryDecorator
+    Logger <|.. InMemoryLogger
+    AnalyticsDecorator --> Logger: logs through
+    LoggingDecorator --> Logger: logs through
+    RetryDecorator --> Logger: logs through
+    DemoApiService --> Logger: logs through
     AnalyticsDecorator --> ApiService: wraps
     LoggingDecorator --> ApiService: wraps
     RetryDecorator --> ApiService: wraps
-    DemoApiService --> ApiService: delegates
+    DemoApiService --> ApiService: wraps
 ```
 
 ## When to Use
@@ -490,15 +454,3 @@ Avoid Decorator when:
 ## Key Takeaway
 
 > **Keep the original object focused, then wrap it with objects that add composable behavior.**
-
-```text
-Core service
-    ↓
-Decorator
-    ↓
-Decorator
-    ↓
-Decorator
-```
-
-The core implementation stays unchanged while callers continue to use the same abstraction.
