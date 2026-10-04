@@ -100,12 +100,12 @@ decorators are composed.
 The React Native demo visualizes the request moving through the decorator chain:
 
 <p align="center">
-  <img src="./decorator_demo.gif" alt="Decorator Pattern demo showing an API request moving through Analytics, Logging, Retry, and User API" width="300" />
+  <img src="decorator_demo.gif" alt="Decorator Pattern demo showing an API request moving through Analytics, Logging, Retry, and User API" width="300" />
 </p>
 
 The screen lets you choose a scenario, run the request, and watch the recorded execution trace and active pipeline step.
 The request finishes before the buffered log messages are replayed with a delay; the trace is a visualization, not live
-instrumentation. See [`DecoratorDemoScreen.tsx`](./demo/DecoratorDemoScreen.tsx).
+instrumentation. See [`DecoratorDemoScreen.tsx`](demo/DecoratorDemoScreen.tsx).
 
 ### Scenarios
 
@@ -139,8 +139,8 @@ Analytics → Logging → Retry
 
 The demo's retry decorator is configured with its default `maxRetries` value of `1`: that means **one retry after the
 initial request**, or at most two attempts total. The scenario behavior is implemented by [
-`DemoApiService.ts`](./demo/DemoApiService.ts) and assembled in [
-`createDecoratorDemoService.ts`](./demo/createDecoratorDemoService.ts).
+`DemoApiService.ts`](demo/DemoApiService.ts) and assembled in [
+`createDecoratorDemoService.ts`](demo/createDecoratorDemoService.ts).
 
 ## How It Works
 
@@ -348,7 +348,7 @@ React Native screen
 
 ## Why Decorator Order Matters
 
-The demo composes the services in [`createDecoratorDemoService.ts`](./demo/createDecoratorDemoService.ts):
+The demo composes the services in [`createDecoratorDemoService.ts`](demo/createDecoratorDemoService.ts):
 
 ```text
 Analytics → Logging → Retry → Demo API → User API

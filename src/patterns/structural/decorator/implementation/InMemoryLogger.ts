@@ -1,4 +1,4 @@
-import { Logger } from './Logger';
+import { Logger } from './Logger.ts';
 
 export class InMemoryLogger implements Logger {
   private readonly messages: string[] = [];
