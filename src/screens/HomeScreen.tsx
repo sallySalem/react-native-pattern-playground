@@ -29,6 +29,11 @@ const HomeScreen = ({ navigation }: Props) => {
         title="Decorator Pattern"
         onPress={() => navigation.navigate('Decorator')}
       />
+
+      <Button
+        title="Factory Pattern"
+        onPress={() => navigation.navigate('Factory')}
+      />
     </View>
   );
 };
