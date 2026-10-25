@@ -87,8 +87,9 @@ Patterns that focus on communication between objects and how behavior can vary i
 
 Patterns that focus on object creation and initialization.
 
-| Pattern | Example | Status |
-|---------|---------|--------|
+| Pattern            | Example                                                                                                    | Status       |
+|--------------------|------------------------------------------------------------------------------------------------------------|--------------|
+| **Simple Factory** | [Checkout and Payment Processing](src/patterns/creational/factory/implementation/Simple-factory/README.md) | ✅ Available |
 
 [//]: # (| Factory Method | — | 🚧 Coming soon |)
 
@@ -195,5 +196,3 @@ add tests for new examples.
 ## License
 
 This project is licensed under the MIT License — see the [LICENSE](./LICENSE) file for details.
-
-

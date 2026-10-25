@@ -7,6 +7,7 @@ import StrategyScreen from '../patterns/behavioral/strategy/demo/StrategyScreen'
 import { ObserverScreen } from '../patterns/behavioral/observer/demo/ObserverScreen.tsx';
 import { ChainOfResponsibilityScreen } from '../patterns/behavioral/chain-of-responsibility/demo/ChainOfResponsibilityScreen.tsx';
 import { DecoratorDemoScreen } from '../patterns/structural/decorator/demo/DecoratorDemoScreen.tsx';
+import { FactoryDemoScreen } from '../patterns/creational/factory/demo/FactoryDemoScreen.tsx';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -14,6 +15,7 @@ export type RootStackParamList = {
   Observer: undefined;
   ChainOfResponsibility: undefined;
   Decorator: undefined;
+  Factory: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -29,6 +31,7 @@ export const AppNavigator = () => {
         component={ChainOfResponsibilityScreen}
       />
       <Stack.Screen name="Decorator" component={DecoratorDemoScreen} />
+      <Stack.Screen name="Factory" component={FactoryDemoScreen} />
     </Stack.Navigator>
   );
 };
