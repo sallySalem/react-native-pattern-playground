@@ -83,7 +83,7 @@ Patterns that focus on communication between objects and how behavior can vary i
 
 [//]: # (| Interpreter | — | 🚧 Coming soon |)
 
-### 🏗️ Creational Patterns and Idioms
+### 🏗️ Creational Patterns
 
 Patterns that focus on object creation and initialization.
 
